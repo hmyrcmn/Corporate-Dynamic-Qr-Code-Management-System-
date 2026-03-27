@@ -397,9 +397,10 @@
         }
 
         .dashboard-action-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 2.6rem));
             gap: 0.55rem;
+            justify-content: start;
         }
 
         @media (min-width: 64rem) {
@@ -416,8 +417,7 @@
             }
 
             .dashboard-action-grid {
-                justify-content: flex-end;
-                flex-wrap: nowrap;
+                justify-content: end;
             }
         }
     </style>
