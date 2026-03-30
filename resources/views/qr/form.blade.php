@@ -292,8 +292,90 @@
 
         @media (min-width: 64rem) {
             .qr-form-page {
-                min-height: calc(100svh - 8.25rem);
-                align-items: center;
+                min-height: calc(100svh - 7.4rem);
+                align-items: flex-start;
+            }
+
+            .qr-form-shell {
+                width: min(100%, 41.5rem);
+            }
+
+            .qr-form-breadcrumb {
+                margin-bottom: 0.9rem;
+            }
+
+            .qr-form-header {
+                padding: 1.45rem 1.65rem 1.15rem;
+            }
+
+            .qr-form-header::after {
+                left: 1.65rem;
+                right: 1.65rem;
+            }
+
+            .qr-form-header-row {
+                gap: 1rem;
+            }
+
+            .qr-form-icon {
+                height: 3rem;
+                width: 3rem;
+            }
+
+            .qr-form-icon svg {
+                height: 1.3rem;
+                width: 1.3rem;
+            }
+
+            .qr-form-title {
+                font-size: clamp(1.45rem, 2vw, 1.9rem);
+            }
+
+            .qr-form-copy {
+                font-size: 0.84rem;
+                line-height: 1.5;
+                margin-top: 0.35rem;
+            }
+
+            .qr-form-body {
+                padding: 1.3rem 1.65rem 1.45rem;
+            }
+
+            .qr-form-stack {
+                gap: 1rem;
+            }
+
+            .qr-form-field-label {
+                margin-bottom: 0.45rem;
+                font-size: 0.8rem;
+            }
+
+            .qr-form-input {
+                min-height: 3.2rem;
+                padding-inline: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .qr-form-meta {
+                gap: 0.8rem;
+                margin-top: 1rem;
+            }
+
+            .qr-form-meta-card,
+            .qr-form-tools {
+                padding: 0.85rem 1rem;
+            }
+
+            .qr-form-actions {
+                gap: 0.8rem;
+                padding-top: 1rem;
+                margin-top: 0.8rem;
+            }
+
+            .qr-form-submit,
+            .qr-form-cancel {
+                min-height: 2.9rem;
+                font-size: 0.88rem;
             }
         }
 
@@ -372,6 +454,23 @@
                         @endif
 
                         <div class="qr-form-stack">
+                            @if(auth()->user()->hasGlobalAccess())
+                                <div class="col-span-full mb-1">
+                                    <label for="department_id" class="qr-form-field-label">Birim (Admin)</label>
+                                    <select id="department_id" name="department_id" required class="field-shell qr-form-input appearance-none bg-no-repeat bg-[right_1.25rem_center] bg-[length:1.2em_1.2em]" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22currentColor%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E');">
+                                        <option value="">Birim Seciniz</option>
+                                        @foreach($departments as $dept)
+                                            <option value="{{ $dept->id }}" @selected(old('department_id', $qrCode->department_id) == $dept->id)>
+                                                {{ $dept->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('department_id')
+                                        <span class="mt-1 block text-[0.78rem] font-semibold text-rose-500">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endif
+
                             <div>
                                 <label for="title" class="qr-form-field-label">Baslik</label>
                                 <input type="text" id="title" name="title" required maxlength="255" value="{{ old('title', $qrCode->title) }}" class="field-shell qr-form-input" placeholder="Orn: Yaz Kursu Katalogu">

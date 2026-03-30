@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Enums\UserRole;
 use App\Models\Department;
 use App\Models\User;
+use App\Providers\Filament\AdminPanelProvider;
 use App\Support\LdapUsername;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -18,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        if ($this->shouldRegisterAdminPanel()) {
+            $this->app->register(AdminPanelProvider::class);
+        }
     }
 
     /**
@@ -68,5 +71,18 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(Imported::class, $syncUser);
         Event::listen(Synchronized::class, $syncUser);
+    }
+
+    private function shouldRegisterAdminPanel(): bool
+    {
+        if ($this->app->runningInConsole()) {
+            return true;
+        }
+
+        if (! $this->app->bound('request')) {
+            return false;
+        }
+
+        return $this->app['request']->is('admin') || $this->app['request']->is('admin/*');
     }
 }

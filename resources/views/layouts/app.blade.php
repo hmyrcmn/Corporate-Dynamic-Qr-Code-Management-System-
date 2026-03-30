@@ -8,9 +8,7 @@
     <meta name="theme-color" content="#f4f7f8" id="theme-color-meta">
     <link rel="icon" type="image/png" href="{{ asset('img/yee-favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/yee-favicon.png') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('fonts/filament/filament/inter/index.css') }}">
     <script>
         (function () {
             const theme = localStorage.getItem('dynamicqr-theme');
@@ -25,7 +23,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="min-h-screen overflow-x-hidden antialiased sf-text">
+<body class="ui-lite min-h-screen overflow-x-hidden antialiased sf-text">
     <div class="ambient-bg">
         <div class="ambient-grid"></div>
         <div class="ambient-orb orb-a"></div>

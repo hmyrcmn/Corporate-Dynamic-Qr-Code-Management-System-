@@ -15,7 +15,7 @@ class AuthAndDashboardTest extends TestCase
 
     public function test_public_pages_are_reachable(): void
     {
-        $this->get('/')->assertOk()->assertSee('QR surecini birkac adimda baslatin.');
+        $this->get('/')->assertOk()->assertSeeText('QR sürecini hızlıca başlatın.');
         $this->get('/login')->assertOk()->assertSee('Guvenli personel girisi');
         $this->get('/admin/login')->assertOk();
     }
@@ -29,8 +29,10 @@ class AuthAndDashboardTest extends TestCase
     public function test_seeded_local_super_admin_can_log_in_from_login_form(): void
     {
         $this->seed();
+        $token = 'test-token';
 
-        $response = $this->post('/login', [
+        $response = $this->withSession(['_token' => $token])->post('/login', [
+            '_token' => $token,
             'username' => 'admin',
             'password' => 'ChangeMe123!',
         ]);
@@ -43,8 +45,10 @@ class AuthAndDashboardTest extends TestCase
     public function test_domain_qualified_username_can_log_in_to_seeded_local_account(): void
     {
         $this->seed();
+        $token = 'test-token';
 
-        $response = $this->post('/login', [
+        $response = $this->withSession(['_token' => $token])->post('/login', [
+            '_token' => $token,
             'username' => 'YEE\\admin',
             'password' => 'ChangeMe123!',
         ]);
@@ -108,5 +112,38 @@ class AuthAndDashboardTest extends TestCase
             ->assertOk()
             ->assertSee('Kultur Kaydi')
             ->assertDontSee('Destek Kaydi');
+    }
+
+    public function test_authenticated_user_can_download_qr_as_svg(): void
+    {
+        $department = Department::create([
+            'name' => 'Kultur',
+            'is_active' => true,
+        ]);
+
+        $user = User::create([
+            'name' => 'Birim Kullanici',
+            'username' => 'birim.kullanici',
+            'email' => 'birim@example.test',
+            'password' => 'Password123!',
+            'department_id' => $department->id,
+            'role' => UserRole::DEPT_USER->value,
+            'is_active' => true,
+        ]);
+
+        $qrCode = QrCode::create([
+            'department_id' => $department->id,
+            'created_by_id' => $user->id,
+            'title' => 'Kultur Kaydi',
+            'destination_url' => 'https://www.yee.org.tr/kultur',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($user)
+            ->get("/download-qr/{$qrCode->short_id}?inline=1")
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/svg+xml')
+            ->assertHeader('Content-Disposition', "inline; filename=\"qr-{$qrCode->short_id}.svg\"")
+            ->assertSee('<svg', false);
     }
 }

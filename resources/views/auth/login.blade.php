@@ -8,9 +8,7 @@
     <meta name="theme-color" content="#eef4f4" id="theme-color-meta">
     <link rel="icon" type="image/png" href="{{ asset('img/yee-favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/yee-favicon.png') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('fonts/filament/filament/inter/index.css') }}">
     <script>
         (function () {
             const theme = localStorage.getItem('dynamicqr-theme');
@@ -37,7 +35,7 @@
             content: '';
             position: absolute;
             border-radius: 999px;
-            filter: blur(120px);
+            filter: blur(56px);
         }
 
         .login-background::before {
@@ -104,7 +102,7 @@
             padding: 1.9rem 1.75rem 1.45rem;
             border: 1px solid rgba(255, 255, 255, 0.74);
             box-shadow:
-                0 36px 88px rgba(68, 128, 139, 0.14),
+                0 18px 42px rgba(68, 128, 139, 0.1),
                 0 0 0 1px rgba(255, 255, 255, 0.34),
                 inset 0 1px 0 rgba(255, 255, 255, 0.72);
         }
@@ -433,7 +431,7 @@
         }
     </style>
 </head>
-<body class="min-h-full sf-text">
+<body class="ui-lite min-h-full sf-text">
     <div class="login-background"></div>
 
     <main class="login-viewport flex items-center justify-center px-4 py-4 md:px-5 md:py-5 lg:px-6 lg:py-6">

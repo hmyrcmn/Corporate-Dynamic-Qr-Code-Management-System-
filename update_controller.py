@@ -1,11 +1,19 @@
-<?php
+import sys
+import re
+
+c_path = r"c:\Users\humeyra.cimen\Desktop\yunusEmre\laraveldynamicqr\app\Http\Controllers\QrCodeController.php"
+
+with open(c_path, "r", encoding="utf-8") as f:
+    content = f.read()
+
+content_new = """<?php
 
 namespace App\Http\Controllers;
 
 use App\Models\QrCode;
 use App\Models\Department;
 use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Writer\SvgWriter;
+use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -97,18 +105,18 @@ class QrCodeController extends Controller
     public function download(Request $request, string $shortId): Response
     {
         $qrCode = $this->resolveAccessibleQrCode($request, $shortId);
-        $payload = (new Builder(
-            writer: new SvgWriter(),
-            data: route('qr.redirect', $qrCode->short_id),
-            size: 480,
-            margin: 2,
-        ))->build();
+        $payload = Builder::create()
+            ->writer(new PngWriter())
+            ->data(route('qr.redirect', $qrCode->short_id))
+            ->size(480)
+            ->margin(18)
+            ->build();
 
         $disposition = $request->boolean('inline') ? 'inline' : 'attachment';
 
         return response($payload->getString(), 200, [
-            'Content-Type' => 'image/svg+xml',
-            'Content-Disposition' => sprintf('%s; filename="qr-%s.svg"', $disposition, $qrCode->short_id),
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => sprintf('%s; filename="qr-%s.png"', $disposition, $qrCode->short_id),
         ]);
     }
 
@@ -154,3 +162,9 @@ class QrCodeController extends Controller
         return $payload;
     }
 }
+"""
+
+with open(c_path, "w", encoding="utf-8") as f:
+    f.write(content_new)
+
+print("Controller updated")

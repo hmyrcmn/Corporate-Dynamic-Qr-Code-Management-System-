@@ -576,6 +576,12 @@
                         </div>
                     @endforelse
                 </div>
+                
+                @if($qrCodes->hasPages())
+                <div class="mt-6 flex justify-center pb-2">
+                    {{ $qrCodes->links() }}
+                </div>
+                @endif
             </div>
         </div>
     </section>
@@ -635,6 +641,12 @@
             imgEl.onload = function () {
                 loader.classList.add('hidden');
                 imgEl.classList.remove('hidden');
+            };
+            imgEl.onerror = function () {
+                loader.classList.add('hidden');
+                imgEl.classList.add('hidden');
+                titleEl.textContent = 'Gorsel Yuklenemedi (Tarayici veya Sunucu Hatasi)';
+                titleEl.classList.add('text-rose-500');
             };
 
             modal.classList.remove('hidden');

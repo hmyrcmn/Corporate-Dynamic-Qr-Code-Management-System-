@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\QrCode;
+use App\Models\ScanAnalytics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -11,30 +14,53 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-
-        $baseQuery = QrCode::query()
-            ->with(['department', 'creator'])
-            ->withCount('scans')
-            ->accessibleTo($user);
-
-        $summary = (clone $baseQuery)->get();
         $activeSelected = $request->boolean('active');
         $scannedSelected = $request->boolean('scanned');
 
-        $qrCodes = (clone $baseQuery);
+        $summary = Cache::remember(
+            sprintf('dashboard-summary:%s', $user->getAuthIdentifier()),
+            now()->addSeconds(30),
+            function () use ($user): array {
+                $accessibleQrCodes = QrCode::query()->accessibleTo($user);
 
-        if ($activeSelected) {
-            $qrCodes->where('is_active', true);
-        }
+                $totalScans = ScanAnalytics::query()
+                    ->join('qr_codes', 'qr_codes.id', '=', 'scan_analytics.qr_code_id')
+                    ->when(
+                        ! $user->hasGlobalAccess(),
+                        fn (Builder $query): Builder => $query->where('qr_codes.department_id', $user->department_id ?? 0),
+                    )
+                    ->count();
+
+                return [
+                    'allQrCount' => (clone $accessibleQrCodes)->count(),
+                    'activeQrCount' => (clone $accessibleQrCodes)->where('is_active', true)->count(),
+                    'totalScans' => $totalScans,
+                ];
+            },
+        );
+
+        $qrCodesQuery = $this->applyFilters(
+            QrCode::query()
+                ->with([
+                    'department:id,name',
+                    'creator:id,name,username',
+                ])
+                ->withCount('scans')
+                ->accessibleTo($user),
+            $activeSelected,
+            $scannedSelected,
+        );
 
         if ($scannedSelected) {
-            $qrCodes->whereHas('scans');
+            $qrCodesQuery->orderByDesc('scans_count');
         }
 
-        $qrCodes = $qrCodes
-            ->orderByDesc($scannedSelected ? 'scans_count' : 'created_at')
+        $qrCodes = $qrCodesQuery
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate(30)
+            ->withQueryString();
+
+        $filteredQrCount = $qrCodes->total();
 
         if ($activeSelected && $scannedSelected) {
             $filterTitle = 'Aktif ve taranan kayitlar';
@@ -52,10 +78,10 @@ class DashboardController extends Controller
 
         return view('dashboard.index', [
             'qrCodes' => $qrCodes,
-            'allQrCount' => $summary->count(),
-            'activeQrCount' => $summary->where('is_active', true)->count(),
-            'totalScans' => $summary->sum('scans_count'),
-            'filteredQrCount' => $qrCodes->count(),
+            'allQrCount' => $summary['allQrCount'],
+            'activeQrCount' => $summary['activeQrCount'],
+            'totalScans' => $summary['totalScans'],
+            'filteredQrCount' => $filteredQrCount,
             'filterTitle' => $filterTitle,
             'filterDescription' => $filterDescription,
             'activeFilterSelected' => $activeSelected,
@@ -74,5 +100,18 @@ class DashboardController extends Controller
                 ? 'Tum Birimler'
                 : ($user->department?->name ?? 'Atanmamis Birim'),
         ]);
+    }
+
+    private function applyFilters(Builder $query, bool $activeSelected, bool $scannedSelected): Builder
+    {
+        if ($activeSelected) {
+            $query->where('is_active', true);
+        }
+
+        if ($scannedSelected) {
+            $query->whereHas('scans');
+        }
+
+        return $query;
     }
 }

@@ -7,9 +7,9 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-display: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter Variable', 'Segoe UI', 'Segoe UI Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Inter Variable', 'Segoe UI', 'Segoe UI Variable', ui-sans-serif, system-ui, sans-serif;
     --color-brand-ink: #10202a;
     --color-brand-aqua: #12bcc8;
     --color-brand-teal: #5adadd;
@@ -216,9 +216,9 @@
     .ambient-orb {
         position: absolute;
         border-radius: 999px;
-        filter: blur(90px);
-        opacity: 0.42;
-        animation: float 22s infinite alternate ease-in-out;
+        filter: blur(42px);
+        opacity: 0.24;
+        animation: none;
     }
 
     .orb-a {
@@ -249,8 +249,8 @@
 
     .apple-glass {
         background: var(--glass-bg);
-        backdrop-filter: blur(28px) saturate(180%);
-        -webkit-backdrop-filter: blur(28px) saturate(180%);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--glass-border);
         box-shadow: var(--glass-shadow);
     }
@@ -260,8 +260,8 @@
     .nav-shell,
     .glass-panel {
         background: var(--glass-heavy-bg);
-        backdrop-filter: blur(34px) saturate(190%);
-        -webkit-backdrop-filter: blur(34px) saturate(190%);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid var(--glass-heavy-border);
         box-shadow: var(--glass-heavy-shadow);
     }
@@ -881,6 +881,43 @@
     html:not(.dark) .stat-toggle,
     html:not(.dark) .table-row {
         background: rgba(255, 255, 255, 0.82);
+    }
+
+    .ui-lite .ambient-bg {
+        background: linear-gradient(180deg, rgba(244, 250, 250, 0.98), rgba(255, 255, 255, 0.99));
+    }
+
+    html.dark .ui-lite .ambient-bg {
+        background: linear-gradient(180deg, rgba(6, 18, 22, 0.98), rgba(8, 20, 24, 0.99));
+    }
+
+    .ui-lite .ambient-grid,
+    .ui-lite .ambient-orb,
+    .ui-lite .page-card::before,
+    .ui-lite .brand-panel-glow {
+        opacity: 0.35;
+    }
+
+    .ui-lite .apple-glass-panel,
+    .ui-lite .dashboard-metric,
+    .ui-lite .dashboard-action-btn,
+    .ui-lite .qr-form-card,
+    .ui-lite .login-form-panel {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: 0 12px 28px rgba(16, 32, 42, 0.08) !important;
+    }
+
+    .ui-lite .dashboard-row,
+    .ui-lite .dashboard-metric,
+    .ui-lite .dashboard-action-btn,
+    .ui-lite .ghost-button,
+    .ui-lite .brand-button {
+        transition:
+            transform 160ms ease,
+            border-color 160ms ease,
+            background-color 160ms ease,
+            color 160ms ease !important;
     }
 }
 
