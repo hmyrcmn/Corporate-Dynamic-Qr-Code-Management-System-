@@ -20,15 +20,13 @@ class RedirectController extends Controller
         $destinationHost = (string) parse_url($qrCode->destination_url, PHP_URL_HOST);
 
         if ($destinationHost !== '' && $destinationHost === $request->getHost()) {
-            abort(Response::HTTP_BAD_REQUEST, 'Recursive redirection detected.');
+            abort(Response::HTTP_BAD_REQUEST, 'Döngüsel yönlendirme tespit edildi.');
         }
-
-        $clientIp = trim(explode(',', (string) ($request->header('X-Forwarded-For') ?? $request->ip()))[0]);
 
         ScanAnalytics::create([
             'qr_code_id' => $qrCode->id,
             'timestamp' => now(),
-            'ip_address_hash' => ScanAnalytics::hashIp($clientIp),
+            'ip_address_hash' => ScanAnalytics::hashIp((string) $request->ip()),
             'user_agent' => substr((string) $request->userAgent(), 0, 512),
         ]);
 

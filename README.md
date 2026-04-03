@@ -1,248 +1,140 @@
 # DynamicQR Laravel
 
-Bu proje, kurumsal birimlerin dinamik QR baglantilari uretmesi, bu baglantilari daha sonra ayni kisa adresi bozmadan guncellemesi ve tarama hareketlerini izlemesi icin gelistirilmis bir Laravel uygulamasidir.
+Bu proje, kurumsal birimlerin kendi QR kayitlarini olusturup yonettigi, sabit bir kisa adres uzerinden yonlendirme yaptigi ve tarama analitigi topladigi bir Laravel uygulamasidir.
 
-Uygulama iki ana yuzeyden olusur:
+Bu surumde admin paneli yoktur. Tum yetkili kullanicilar uygulamaya tek giris ekrani olan `/login` uzerinden girer ve sadece kendi birim verilerine erisir.
 
-- Kullanici paneli: LDAP veya yerel hesap ile giris yapan personelin kendi birimi icin QR kaydi yonetmesi
-- Filament admin paneli: yalnizca aktif `SUPER_ADMIN` kullanicilarin tum sistem verisini yonetmesi
+## 1. Sistem Ne Yapar
 
-Bu README, projeyi hic bilmeyen birinin ayni davranisi tekrar kurabilecek kadar ayrintili olacak sekilde hazirlanmistir.
+Temel akis:
 
-## 1. Projenin Tam Olarak Ne Yaptigi
+1. Kullanici `/login` ekranindan LDAP veya yerel hesap ile giris yapar.
+2. Kullanici kendi birimi icin bir QR kaydi olusturur.
+3. Sistem kayda benzersiz bir `short_id` uretir.
+4. Kullanici QR gorselini SVG olarak indirir.
+5. Son kullanici QR kodu okuttugunda istek once bu uygulamaya gelir.
+6. Uygulama taramayi `scan_analytics` tablosuna yazar.
+7. Uygulama kullaniciyi hedef URL'ye yonlendirir.
 
-Sistemin temel amaci kisa bir QR adresi uretmektir.
+Boylece fiziksel QR kod sabit kalir, hedef URL ise sonradan degistirilebilir.
 
-Ornek akis:
+## 2. Ozellikler
 
-1. Kullanici sisteme giris yapar.
-2. Bir baslik ve hedef URL girer.
-3. Sistem bu kayit icin benzersiz bir `short_id` uretir.
-4. QR gorseli, bu kisa adrese yonlenecek sekilde PNG olarak hazirlanir.
-5. Son kullanici QR kodu okuttugunda sistem once kendi kisa adresine gelir.
-6. Sistem taramayi `scan_analytics` tablosuna kaydeder.
-7. Sistem kullaniciyi asil hedef URL'ye yonlendirir.
+- LDAP veya yerel hesap ile giris
+- Birim bazli yetki izolasyonu
+- QR kaydi olusturma, guncelleme, silme
+- SVG formatinda QR indirme
+- Tarama sayisi ve tarama kaydi tutma
+- Hedef URL whitelist kontrolu
+- LDAP kullanicisindan otomatik birim ve kullanici senkronizasyonu
 
-Boylece QR baskisi sabit kalir, ama hedef URL sonradan degistirilebilir.
+## 3. Teknoloji Yigini
 
-## 2. One Cikan Ozellikler
+- PHP 8.3
+- Laravel 13
+- SQLite
+- LdapRecord Laravel
+- Endroid QR Code
+- Blade
+- Vite
+- Tailwind CSS
+- PHPUnit
 
-- LDAP tabanli kimlik dogrulama destegi
-- LDAP kapaliyken veya acil durum senaryosu icin yerel super admin hesabi
-- Departman bazli veri erisimi
-- Dinamik kisa link uretimi
-- PNG formatinda QR kod indirme ve inline onizleme
-- Tarama sayisi takibi
-- Filtrelenebilir kullanici dashboard'u
-- Filament ile ayri yonetim paneli
-- LDAP kullanici bilgisinden otomatik kullanici ve departman esleme
-- Yalnizca izin verilen alan adlarina QR yonlendirmesi
+## 4. Roller ve Yetki Mantigi
 
-## 3. Kullanilan Teknolojiler
+Uygulamada iki rol vardir:
 
-### Backend
-
-- PHP `^8.3`
-- Laravel `^13.0`
-- Eloquent ORM
-- Laravel session, cache ve queue altyapisi
-- SQLite varsayilan gelistirme veritabani
-- LDAP entegrasyonu icin `directorytree/ldaprecord-laravel ^3.4`
-- QR uretimi icin `endroid/qr-code ^6.0`
-- Admin panel icin `filament/filament ^5.4`
-
-### Frontend
-
-- Blade template yapisi
-- Vite `^8`
-- Tailwind CSS `^4`
-- Az miktarda vanilla JavaScript
-- Tamamen sunucu tarafli sayfa mimarisi, SPA yok
-
-### Test ve Gelistirme
-
-- PHPUnit `^12.5`
-- Laravel test runner
-- Laravel Pint
-- Laravel Pail
-
-## 4. Mimari Ozet
-
-Sistemin ana parcalari:
-
-- `routes/web.php`: kullaniciya acik web rotalari
-- `app/Http/Controllers/*`: giris, dashboard, QR CRUD ve yonlendirme akislar
-- `app/Services/LdapDirectoryAuthenticator.php`: ozel LDAP dogrulama ve kullanici senkronizasyonu
-- `app/Models/*`: veritabani modelleri
-- `resources/views/*`: Blade arayuzleri
-- `app/Providers/Filament/AdminPanelProvider.php`: Filament panel konfigrasyonu
-- `app/Filament/*`: admin panel kaynaklari
-
-Yuksek seviye mimari:
-
-1. Kullanici `/login` uzerinden giris dener.
-2. Sistem once yerel admin hesabini dener.
-3. Yerel giris olmazsa LDAP yapilandirmasina gore LDAP dogrulamasi yapilir.
-4. Giris basariliysa kullanici lokal veritabaninda senkronize edilir.
-5. Kullanici `/dashboard` icinde yalnizca yetkili oldugu QR kayitlarini gorur.
-6. QR indirildiginde sistem kisa link adresini encode eden PNG uretir.
-7. Dis kullanici QR'i okuttugunda `/{shortId}` rotasi devreye girer ve yonlendirme yapilir.
-
-## 5. Kimlik Dogrulama ve Yetkilendirme Nasil Calisiyor
-
-### 5.1 Yerel giris
-
-LDAP kapaliysa veya yerel acil durum hesabi aktifse sistem once lokal kullanici tablosunda giris dener.
-
-Yerel kullanici girisi icin kullanilan alanlar:
-
-- `username`
-- `password`
-- `is_active = true`
-
-Varsayilan ornek degerler `.env.example` icinde:
-
-- `LOCAL_SUPER_ADMIN_ENABLED=true`
-- `LOCAL_SUPER_ADMIN_USERNAME=admin`
-- `LOCAL_SUPER_ADMIN_PASSWORD=ChangeMe123!`
-
-`DatabaseSeeder`, bu hesabi ilk kurulumda olusturur.
-
-### 5.2 LDAP giris
-
-LDAP aktifse sistem iki moddan birini kullanir:
-
-- Servis hesabi ile LDAP provider uzerinden `Auth::attempt`
-- Dogrudan son kullanici bind akisi
-
-Dogrudan bind icin aday kullanici adlari su sirayla denenir:
-
-- Kullanicinin yazdigi deger
-- normalize edilmis kullanici adi
-- `username@domain`
-- `NETBIOS\username`
-
-Kullanici basariyla bind olursa dizinden su alanlar okunur:
-
-- kullanici adi
-- ad soyad
-- e-posta
-- departman
-- aktif/pasif durumu
-
-Bu bilgiler local `users` ve gerekirse `departments` tablosuna senkronize edilir.
-
-### 5.3 Kullanici adi normalize etme
-
-`App\Support\LdapUsername` su donusumleri yapar:
-
-- bastaki ve sondaki bosluklari temizler
-- `DOMAIN\kullanici` yazildiysa yalnizca kullanici kismini alir
-- `kullanici@alanadi` yazildiysa yalnizca kullanici kismini alir
-- sonucu kucuk harfe cevirir
-
-Bu sayede su girisler ayni kullaniciya duser:
-
-- `admin`
-- `YEE\admin`
-- `admin@yee.org.tr`
-
-### 5.4 Roller
-
-Tanimli roller:
-
-- `SUPER_ADMIN`
 - `DEPT_MANAGER`
 - `DEPT_USER`
 
-Mevcut yetki davranisi:
+Bu iki rol su an veri kapsami acisindan ayni davranir: kullanici sadece kendi `department_id` degeri ile eslesen QR kayitlarini gorebilir ve yonetebilir.
 
-- `SUPER_ADMIN`: tum QR kayitlarina erisebilir, Filament admin paneline girebilir
-- `DEPT_MANAGER`: dashboard tarafinda bugun icin `DEPT_USER` ile ayni gorunur davranisa sahip
-- `DEPT_USER`: yalnizca kendi departmaninin QR kayitlarini gorur ve yonetir
+Yetki kontrolunun merkezi noktasi `App\Models\QrCode::scopeAccessibleTo()` metodudur. Bu scope:
 
-### 5.5 Giris sonrasi guvenlik kontrolleri
+- kullanicinin birimi varsa sadece o birime ait kayitlari acar
+- kullanicinin birimi yoksa hicbir kaydi acmaz
 
-Basarili giristen sonra sistem sunlari kontrol eder:
+Bu kontrol sadece listelemede degil, su rotalarda da uygulanir:
 
-- kullanici aktif mi
-- global erisimi yoksa `department_id` dolu mu
+- `/dashboard`
+- `/dashboard/edit/{shortId}`
+- `/dashboard/delete/{shortId}`
+- `/download-qr/{shortId}`
 
-Aktif olmayan veya departmansiz normal kullanici sisteme alinmaz.
+Sonuc: birim kullanicilari birbirlerinin QR kayitlarini goremez, duzenleyemez, silemez veya indiremez.
 
-## 6. QR Yonetimi Nasil Calisiyor
+## 5. Rotalar
 
-### 6.1 Kayit olusturma
+Acik rotalar:
 
-Kullanici panelindeki QR olusturma formu su alanlari alir:
+- `GET /`
+- `GET /login`
+- `POST /login`
+- `GET /{shortId}`
+
+Oturum gerektiren rotalar:
+
+- `POST /logout`
+- `GET /dashboard`
+- `GET /dashboard/create`
+- `POST /dashboard/create`
+- `GET /dashboard/edit/{shortId}`
+- `PUT /dashboard/edit/{shortId}`
+- `GET /dashboard/delete/{shortId}`
+- `DELETE /dashboard/delete/{shortId}`
+- `GET /download-qr/{shortId}`
+
+Not: Bu projede `/admin` veya `/admin/login` rotalari yoktur.
+
+## 6. Giris Sistemi Nasil Calisir
+
+Giris akisi:
+
+1. Kullanici adi normalize edilir.
+2. `DOMAIN\\kullanici` veya `kullanici@alanadi` formati `kullanici` haline getirilir.
+3. Yerel hesap aktifse once yerel hesap kontrol edilir.
+4. LDAP aktifse LDAP bind denenir.
+5. LDAP kullanicisi bulunduysa local veritabani ile senkronize edilir.
+6. Kullanici pasifse oturum reddedilir.
+7. Kullanici icin `department_id` yoksa oturum reddedilir.
+8. Basarili giriste oturum acilir ve `last_login_at` guncellenir.
+
+Yerel gelistirme hesabi varsayilan olarak:
+
+- kullanici adi: `operator`
+- e-posta: `operator@dynamicqr.local`
+- sifre: `ChangeMe123!`
+
+Bu hesap `DatabaseSeeder` ile olusur ve `DEPT_MANAGER` rolunde, birime bagli bir kullanicidir.
+
+## 7. QR Akisi
+
+Kayit olusturma alanlari:
 
 - `title`
 - `destination_url`
 - `is_active`
 
-Sistem olusturma sirasinda:
+Kayit olusturma sirasinda:
 
-1. kullanicinin departmanini bulur
-2. form verisini validate eder
-3. hedef URL'nin izinli domain listesinde olup olmadigini kontrol eder
-4. kayit olusturur
-5. `short_id` yoksa model icinde otomatik uretir
+1. Veri validate edilir.
+2. Hedef URL parse edilir.
+3. Host bilgisi `ALLOWED_QR_DOMAINS` whitelist'i ile kontrol edilir.
+4. Kayit, oturumdaki kullanicinin birimine bagli olacak sekilde olusturulur.
+5. `short_id` eksikse model tarafinda otomatik uretim yapilir.
 
-### 6.2 `short_id` uretimi
+## 8. Yonlendirme ve Analitik
 
-`App\Models\QrCode` modelinin `creating` hook'u:
+Public QR rotasi `/{shortId}`:
 
-- 6 karakterlik rastgele bir kucuk harf/rakam kombinasyonu uretir
-- cakisma varsa yeniden uretir
+1. Aktif QR kaydini bulur.
+2. Recursive redirect riskini kontrol eder.
+3. Tarama verisini `scan_analytics` tablosuna yazar.
+4. IP bilgisini dogrudan saklamaz; hash'lenmis deger tutar.
+5. Kullaniciyi hedef URL'ye yonlendirir.
 
-### 6.3 Hedef URL guvenligi
+Analitik alanlari:
 
-Sistem her URL'yi kabul etmez.
-
-Izin verilen alan adlari `ALLOWED_QR_DOMAINS` ile belirlenir.
-
-Varsayilan ornek:
-
-- `yee.org.tr`
-- `gov.tr`
-- `youtube.com`
-
-Kontrol mantigi:
-
-- tam host eslesmesi kabul edilir
-- alt alan adlari da kabul edilir
-
-Ornek:
-
-- `https://yee.org.tr/abc` kabul edilir
-- `https://sub.yee.org.tr/abc` kabul edilir
-- `https://example.com` reddedilir
-
-### 6.4 QR indirme
-
-`/download-qr/{shortId}` rotasi:
-
-- kaydin erisilebilir oldugunu dogrular
-- QR PNG uretir
-- veri olarak kisa yonlendirme adresini encode eder
-- `inline=1` verilirse tarayicida onizlenebilir
-- aksi halde dosya olarak indirilir
-
-### 6.5 Yonlendirme ve analitik
-
-`/{shortId}` rotasi herkese aciktir.
-
-Yonlendirme aninda sistem:
-
-1. ilgili aktif QR kaydini bulur
-2. recursive redirect olup olmadigini kontrol eder
-3. IP bilgisini dogrudan degil hash'lenmis olarak kaydeder
-4. user-agent bilgisini kaydeder
-5. hedef URL'ye `redirect()->away(...)` ile yonlendirir
-
-Analitik tablosunda su alanlar bulunur:
-
-- `qr_code_id`
 - `timestamp`
 - `ip_address_hash`
 - `user_agent`
@@ -250,33 +142,9 @@ Analitik tablosunda su alanlar bulunur:
 - `city`
 - `device_type`
 
-Not: Su an kod tarafinda `country`, `city` ve `device_type` doldurulmuyor; kolonlar ileri kullanim icin hazir.
+## 9. Veritabani Modeli
 
-## 7. Admin Paneli Nasil Calisiyor
-
-Admin panel Filament ile `/admin` altinda acilir.
-
-Giris kurali:
-
-- yalnizca `is_active = true` ve `role = SUPER_ADMIN` kullanicilar girebilir
-
-Admin panelde yonetilen kaynaklar:
-
-- Birimler
-- Kullanicilar
-- QR kayitlari
-- Tarama analitigi
-
-Onemli davranis:
-
-- LDAP aktifken Filament uzerinden manuel kullanici olusturma kapatilmistir
-- kullanicilar, LDAP senkronizasyonu ile veya mevcut yerel kayitlarla yonetilir
-
-## 8. Veritabani Semasi
-
-### `users`
-
-Temel alanlar:
+`users`
 
 - `name`
 - `username`
@@ -289,26 +157,12 @@ Temel alanlar:
 - `is_active`
 - `last_login_at`
 
-Iliskiler:
-
-- `belongsTo Department`
-- `hasMany QrCode` (`created_by_id`)
-
-### `departments`
-
-Alanlar:
+`departments`
 
 - `name`
 - `is_active`
 
-Iliskiler:
-
-- `hasMany User`
-- `hasMany QrCode`
-
-### `qr_codes`
-
-Alanlar:
+`qr_codes`
 
 - `short_id`
 - `department_id`
@@ -317,15 +171,7 @@ Alanlar:
 - `destination_url`
 - `is_active`
 
-Iliskiler:
-
-- `belongsTo Department`
-- `belongsTo User` (`created_by_id`)
-- `hasMany ScanAnalytics`
-
-### `scan_analytics`
-
-Alanlar:
+`scan_analytics`
 
 - `qr_code_id`
 - `timestamp`
@@ -335,141 +181,60 @@ Alanlar:
 - `city`
 - `device_type`
 
-## 9. Rota Haritasi
+## 10. Yerelde Calistirma
 
-### Acik rotalar
+### Bu makinede kullanilan komutlar
 
-- `GET /` : landing sayfasi
-- `GET /login` : giris formu
-- `POST /login` : giris denemesi
-- `GET /{shortId}` : kisa link yonlendirme
+Bu ortamda Laravel komutlari ozel `php.ini` ile calistirildi:
 
-### Giris isteyen rotalar
+PowerShell:
 
-- `POST /logout`
-- `GET /dashboard`
-- `GET /dashboard/create`
-- `POST /dashboard/create`
-- `GET /dashboard/edit/{shortId}`
-- `PUT /dashboard/edit/{shortId}`
-- `GET /dashboard/delete/{shortId}`
-- `DELETE /dashboard/delete/{shortId}`
-- `GET /download-qr/{shortId}`
+```powershell
+$PHP_BIN = "C:\Users\humeyra.cimen\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe"
+$PHP_INI = "C:\Users\humeyra.cimen\Desktop\yunusEmre\.tools\php.ini"
 
-### Filament
+npm install
+npm run build
+& $PHP_BIN -c $PHP_INI artisan migrate --seed
+& $PHP_BIN -c $PHP_INI -S 127.0.0.1:8012 -t public
+```
 
-- `GET /admin`
-- `GET /admin/login`
+CMD:
 
-Onemli not:
+```cmd
+cd C:\Users\humeyra.cimen\Desktop\yunusEmre\laraveldynamicqr
+set PHP_BIN=C:\Users\humeyra.cimen\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe
+set PHP_INI=C:\Users\humeyra.cimen\Desktop\yunusEmre\.tools\php.ini
 
-`/{shortId}` catch-all rotasi oldugu icin tek segmentli tum bilinmeyen adresler QR kisa kodu gibi ele alinir.
+npm install
+npm run build
+"%PHP_BIN%" -c "%PHP_INI%" artisan migrate --seed
+"%PHP_BIN%" -c "%PHP_INI%" -S 127.0.0.1:8012 -t public
+```
 
-## 10. Arayuz Katmani
+Uygulama adresi:
 
-Arayuz tamamen Blade ile olusturulmustur.
+```text
+http://127.0.0.1:8012
+```
 
-Sayfalar:
+### Standart Laravel kurulumu
 
-- `resources/views/landing.blade.php`: pazarlama/karsilama ekrani
-- `resources/views/auth/login.blade.php`: giris ekrani
-- `resources/views/dashboard/index.blade.php`: QR listeleme ve filtre ekrani
-- `resources/views/qr/form.blade.php`: olusturma/duzenleme formu
-- `resources/views/qr/delete.blade.php`: silme onayi
-- `resources/views/errors/404.blade.php`: ozel 404 ekrani
-
-Frontend davranislari:
-
-- tema secimi `localStorage` icinde saklanir
-- mobilde sidebar ac/kapat davranisi vardir
-- landing sayfasinda akis kartina kaydirma animasyonu vardir
-- dashboard'da modal uzerinden QR onizleme yapilir
-
-## 11. Projeyi Sifirdan Kurma
-
-Bu bolum, ayni sistemi yeniden kurmak icin en net baslangic noktasidir.
-
-### 11.1 Gerekenler
-
-- PHP 8.3+
-- Composer
-- Node.js 20+
-- npm
-- SQLite veya baska destekli veritabani
-
-### 11.2 Gerekli PHP eklentileri
-
-Bu proje icin en az su eklentiler aktif olmalidir:
-
-- `mbstring`
-- `dom`
-- `xml`
-- `xmlwriter`
-- `json`
-- `tokenizer`
-- `pdo_sqlite` veya kullandiginiz DB surucusu
-
-Bu kontrol kritik: mevcut ortamda `mbstring` eksik oldugu icin `php artisan` komutlari ve testler calismadi.
-
-### 11.3 Kurulum adimlari
-
-1. Bagimliliklari yukleyin.
+PHP ve Composer sisteminizde dogru kuruluysa:
 
 ```bash
 composer install
-npm install
-```
-
-2. Ortam dosyasini hazirlayin.
-
-```bash
 copy .env.example .env
-```
-
-3. Uygulama anahtarini uretin.
-
-```bash
 php artisan key:generate
-```
-
-4. Gelistirme icin SQLite kullanacaksaniz `database/database.sqlite` dosyasinin var oldugundan emin olun.
-
-5. Veritabanini migrate edin ve seed calistirin.
-
-```bash
 php artisan migrate --seed
-```
-
-6. Frontend derlemesini alin.
-
-```bash
+npm install
 npm run build
-```
-
-7. Uygulamayi baslatin.
-
-```bash
 php artisan serve
 ```
 
-Isterseniz gelistirme sirasinda:
+## 11. Gerekli Ortam Degiskenleri
 
-```bash
-npm run dev
-```
-
-### 11.4 Ilk giris
-
-LDAP kapaliysa varsayilan ornek giris:
-
-- kullanici adi: `admin`
-- sifre: `ChangeMe123!`
-
-Bu degerler uretim ortaminda mutlaka degistirilmelidir.
-
-## 12. `.env` Yapilandirma Rehberi
-
-### 12.1 Uygulama
+Uygulama:
 
 - `APP_NAME`
 - `APP_ENV`
@@ -477,34 +242,12 @@ Bu degerler uretim ortaminda mutlaka degistirilmelidir.
 - `APP_URL`
 - `APP_TIMEZONE`
 
-### 12.2 Veritabani
+Veritabani:
 
-Varsayilan ornek SQLite'dir:
-
-- `DB_CONNECTION=sqlite`
-
-MySQL kullanacaksaniz:
-
-- `DB_CONNECTION=mysql`
-- `DB_HOST`
-- `DB_PORT`
+- `DB_CONNECTION`
 - `DB_DATABASE`
-- `DB_USERNAME`
-- `DB_PASSWORD`
 
-### 12.3 Session, cache, queue
-
-Varsayilan ornekler:
-
-- `SESSION_DRIVER=database`
-- `CACHE_STORE=database`
-- `QUEUE_CONNECTION=database`
-
-Bu durumda ilgili migration'larin calismis olmasi gerekir.
-
-### 12.4 LDAP
-
-Temel LDAP degiskenleri:
+LDAP:
 
 - `LDAP_ENABLED`
 - `LDAP_HOSTS`
@@ -518,224 +261,108 @@ Temel LDAP degiskenleri:
 - `LDAP_DISPLAY_ATTRIBUTE`
 - `LDAP_EMAIL_ATTRIBUTE`
 - `LDAP_DEPARTMENT_ATTRIBUTE`
-- `LDAP_SSL`
-- `LDAP_TLS`
 - `LDAP_FORCE_USER_BIND`
 - `LDAP_ONLY_ENABLED_USERS`
 - `LDAP_USER_FILTER`
-- `LDAP_SUPER_ADMIN_USERNAME`
 
-LDAP senaryosu ornegi:
+Yerel hesap:
 
-- `LDAP_ENABLED=true`
-- `LDAP_HOSTS=ldap-sunucu-1,ldap-sunucu-2`
-- `LDAP_BASE_DN=DC=yee,DC=org,DC=tr`
-- `LDAP_DOMAIN=yee.org.tr`
-- `LDAP_NETBIOS_DOMAIN=YEE`
+- `LOCAL_ACCOUNT_ENABLED`
+- `LOCAL_ACCOUNT_USERNAME`
+- `LOCAL_ACCOUNT_PASSWORD`
 
-### 12.5 Yerel acil durum hesabi
-
-- `LOCAL_SUPER_ADMIN_ENABLED`
-- `LOCAL_SUPER_ADMIN_USERNAME`
-- `LOCAL_SUPER_ADMIN_PASSWORD`
-
-Onemli davranis:
-
-`LDAP_SUPER_ADMIN_USERNAME` doluysa ve bu kullanici yerel admin ile ayni degilse, seed edilen yerel hesap `SUPER_ADMIN` degil `DEPT_MANAGER` olur. Yani gercek global yetki LDAP tarafina birakilir.
-
-### 12.6 QR guvenligi
+QR guvenligi:
 
 - `ALLOWED_QR_DOMAINS`
 - `IP_HASH_SALT`
 
-## 13. LDAP Akisini Adim Adim Anlama
+## 12. Projeyi Sifirdan Ayni Sekilde Kurmak Isterseniz
 
-LDAP acikken girisin teknik sirasi soyledir:
+Bu sistemi sifirdan kurmak icin davranis olarak su parcalar gerekir:
 
-1. Kullanici formdan kullanici adi ve sifre girer.
-2. Kullanici adi normalize edilir.
-3. Uygulama once yerel acil durum hesabini dener.
-4. Yerel giris olmazsa LDAP akisina gecilir.
-5. Base DN bossa islem durur.
-6. Bind icin farkli kullanici adi varyasyonlari denenir.
-7. Kullanici bind olursa dizinden profil cekilir.
-8. Gerekirse `departments` kaydi olusturulur.
-9. Kullanici local tabloda bulunur veya olusturulur.
-10. `LDAP_SUPER_ADMIN_USERNAME` eslesiyorsa rol `SUPER_ADMIN`, aksi halde `DEPT_USER` atanir.
-11. Kullanici aktif degilse veya departmansiz normal kullaniciysa giris geri cevrilir.
-12. Oturum yenilenir ve `last_login_at` guncellenir.
+1. `users`, `departments`, `qr_codes`, `scan_analytics` migration'lari
+2. `User`, `Department`, `QrCode`, `ScanAnalytics` modelleri
+3. LDAP ve yerel hesap destekli auth akisi
+4. Birim bazli sorgu scopu
+5. QR CRUD controller'lari
+6. Public redirect controller'i
+7. QR SVG indirme endpoint'i
+8. URL whitelist kontrolu
+9. Scan analitigi yazimi
 
-LDAP kullanici dogrulama testi icin ek komut:
+Sistemin ayni davranmasi icin su kurallar korunmalidir:
 
-```bash
-php artisan dynamicqr:ldap:lookup kullaniciadi
+- kullanici adini normalize etmek
+- yerel hesabi LDAP'den once denemek
+- LDAP kullanicisini local tabloya senkronize etmek
+- birimi olmayan kullaniciyi sisteme almamak
+- QR kayitlarini departman bazli sinirlamak
+- redirect aninda analitik yazmak
+- hedef URL'yi whitelist ile sinirlamak
+- kisa linki sabit, hedef URL'yi degistirilebilir tutmak
+
+## 13. Testler
+
+Bu repoda calistirilan test komutu:
+
+```powershell
+& "C:\Users\humeyra.cimen\AppData\Local\Microsoft\WinGet\Packages\PHP.PHP.8.3_Microsoft.Winget.Source_8wekyb3d8bbwe\php.exe" -c "C:\Users\humeyra.cimen\Desktop\yunusEmre\.tools\php.ini" vendor\bin\phpunit --testdox
 ```
 
-## 14. Dashboard Davranisi
+Test kapsaminda dogrulanan noktalar:
 
-Dashboard, kullanicinin erisebildigi QR kayitlarini listeler.
+- public sayfalarin acilmasi
+- `/admin` ve `/admin/login` rotalarinin olmamasi
+- seeded local account ile giris
+- domain qualified username ile giris
+- seeded local account'in birime bagli olmasi
+- kullanicinin sadece kendi birim QR kayitlarini gormesi
+- baska birimin QR kaydini indirememe, duzenleyememe ve silememe
 
-Hesaplanan ozetler:
+## 14. Guvenlik ve Yayina Hazirlik
 
-- toplam gorulebilen QR sayisi
-- aktif QR sayisi
-- toplam tarama sayisi
-- filtrelenmis kayit sayisi
+Kontrol edilen ana alanlar:
 
-Desteklenen filtreler:
+- yatay yetki ihlali
+- birimler arasi veri sizmasi
+- recursive redirect
+- URL whitelist atlama denemeleri
+- IP spoofing riski
 
-- yalnizca aktif kayitlar
-- yalnizca taranmis kayitlar
-- her iki filtrenin birlikte kullanimi
+Bu surumde kritik olarak korunmus davranislar:
 
-Siralama:
+- kullanici sadece kendi biriminin QR kayitlarini gorebilir
+- `download`, `edit` ve `delete` rotalari da ayni scope ile korunur
+- scan IP bilgisi hash'lenir
+- hedef URL whitelist ile sinirlanir
 
-- taranmis filtresi acikken `scans_count` oncelikli
-- diger durumda `created_at` azalan
+Yayina cikmadan once mutlaka:
 
-## 15. Filament Kaynaklari
+1. `APP_DEBUG=false` yapin.
+2. `LOCAL_ACCOUNT_PASSWORD` degerini degistirin.
+3. Mümkunse yerel hesabi sadece acil durum senaryosu icin acik tutun.
+4. LDAP icin TLS veya LDAPS kullanin.
+5. `IP_HASH_SALT` icin guclu bir gizli deger kullanin.
+6. `ALLOWED_QR_DOMAINS` listesini minimum gerekli alan adlari ile sinirlayin.
+7. Reverse proxy kullaniyorsaniz trusted proxy ayarlarini dogru yapin.
 
-### Birimler
+## 15. Onemli Dosyalar
 
-- birim adi
-- aktiflik
-- kullanici sayisi
-- QR sayisi
+- `routes/web.php`: tum web rotalari
+- `app/Http/Controllers/AuthController.php`: login ve logout akisi
+- `app/Services/CredentialsAuthenticator.php`: yerel hesap ve LDAP auth orkestrasyonu
+- `app/Services/LdapDirectoryAuthenticator.php`: LDAP bind ve local sync
+- `app/Http/Controllers/DashboardController.php`: dashboard ve filtreleme
+- `app/Http/Controllers/QrCodeController.php`: QR CRUD ve SVG indirme
+- `app/Http/Controllers/RedirectController.php`: public yonlendirme ve scan kaydi
+- `app/Models/QrCode.php`: `short_id` ve `accessibleTo()` scope'u
+- `database/seeders/DatabaseSeeder.php`: varsayilan yerel hesap seed'i
 
-### Kullanicilar
+## 16. Hizli Ozet
 
-- ad soyad
-- kullanici adi
-- e-posta
-- birim
-- rol
-- aktiflik
-- son giris zamani
-
-### QR kayitlari
-
-- kisa kod
-- hedef URL
-- bagli departman
-- olusturan kullanici
-- tarama sayisi
-
-### Tarama analitigi
-
-- zaman
-- QR kaydi
-- IP hash
-- user-agent
-
-## 16. Dizin Yapisi
-
-```text
-app/
-  Enums/
-  Filament/
-  Http/Controllers/
-  Ldap/
-  Models/
-  Providers/
-  Services/
-  Support/
-bootstrap/
-config/
-database/
-  migrations/
-  seeders/
-public/
-resources/
-  css/
-  js/
-  views/
-routes/
-tests/
-```
-
-## 17. Mevcut Test Kapsami
-
-Projede ozellikle su senaryolar icin feature test var:
-
-- public sayfalar aciliyor mu
-- guest dashboard'dan login'e yonleniyor mu
-- seeded local admin giris yapabiliyor mu
-- `YEE\admin` formati normalize oluyor mu
-- LDAP super admin konfigure edilirse seed rolu degisiyor mu
-- departman kullanicisi sadece kendi departman QR'larini goruyor mu
-
-Henuz test kapsami olmayan ama kritik alanlar:
-
-- QR olusturma/guncelleme/silme
-- domain whitelist validasyonu
-- redirect analitik kaydi
-- Filament yetki sinirlari
-- LDAP servis hesabi ve direkt bind varyasyonlari
-
-## 18. Dogrulanan Bulgular ve Hatalar
-
-Bu bolum, kod ve komut calistirmalariyla dogrulanmis mevcut sorunlari icerir.
-
-### Kritik
-
-1. `mbstring` eksikse uygulama ayaga kalkmiyor.
-   - Bu ortamda `php artisan about` cagrisi `Illuminate\Support\Str::studly()` icinde `mb_split` eksikligiyle dustu.
-   - `php artisan test` de ayni nedenle baslayamadi.
-   - Sonuc: sunucu komutlari, testler ve bazi runtime akislar calismaz.
-
-2. Departmansiz global kullanici dashboard'dan QR olusturamiyor.
-   - Giris akisi global kullaniciyi departman olmadan kabul ediyor.
-   - Dashboard menusu her giris yapan kullaniciya `Yeni Kayit` baglantisini gosteriyor.
-   - Ancak `QrCodeController::store()` kullanici departmani yoksa `400 Bad Request` ile islemi kesiyor.
-   - Sonuc: LDAP ile gelen bir `SUPER_ADMIN`, departman bilgisi yoksa forma girebilir ama kaydi tamamlayamaz.
-
-### Orta
-
-3. `run-local.ps1` tasinabilir degil.
-   - PHP yolu tek bir Windows kullanici profiline sabitlenmis.
-   - `php.ini` yolu da proje disindaki ozel bir `.tools` klasorune bagli.
-   - Sonuc: script baska makinede buyuk olasilikla dogrudan calismaz.
-
-4. Ornek ortam dosyasi uretim oncesi mutlaka temizlenmeli.
-   - `.env.example` icinde somut LDAP host ornegi bulunuyor.
-   - Ayni dosyada varsayilan yerel admin sifresi de acikca yer aliyor.
-   - Sonuc: bu degerler paylasilmis repo icinde birakilirsa operasyonel risk olusturur.
-
-### Dogrulama ozeti
-
-- `npm run build` basariyla gecti
-- `php artisan about` basarisiz: `mbstring` eksik
-- `php artisan test` basarisiz: `mbstring` eksik
-
-## 19. Uretime Alma Notlari
-
-Uretime cikmadan once en az sunlari yapin:
-
-1. `APP_DEBUG=false`
-2. gercek `APP_URL` tanimlayin
-3. `LOCAL_SUPER_ADMIN_PASSWORD` degistirin
-4. gerekiyorsa `LOCAL_SUPER_ADMIN_ENABLED=false` yapin
-5. `IP_HASH_SALT` degerini guclu ve gizli bir degerle degistirin
-6. `ALLOWED_QR_DOMAINS` listesini kurumsal gereksinime gore daraltin
-7. PHP eklentilerini tam kurun
-8. kuyruk, cache ve session suruculerini uretim altyapisina gore ayarlayin
-9. dosya ve log izinlerini dogrulayin
-10. Filament admin erisimini sadece gerekli kisilere birakin
-
-## 20. Projeyi Ayni Sekilde Yeniden Yapmak Isteyenler Icin Kisa Ozet
-
-Bu sistemi sifirdan yeniden yapmak istiyorsaniz su kombinasyonu kurmaniz gerekir:
-
-- Laravel 13
-- PHP 8.3
-- Blade tabanli arayuz
-- Tailwind CSS 4 + Vite 8
-- LDAP dogrulama icin LdapRecord-Laravel
-- QR uretimi icin Endroid QR Code
-- Filament 5 admin paneli
-- `users`, `departments`, `qr_codes`, `scan_analytics` veri modeli
-- departman bazli erisim kurali
-- kisa link yonlendirme + analitik kaydi
-- theme toggle, dashboard filtreleri ve QR modal onizleme
-
-Yani proje ozunde bir "kurumsal dinamik QR yonetim sistemi"dir; LDAP dogrulama, departman yetkilendirmesi, kisa link yonlendirmesi ve yonetim paneli birlikte calisir.
+- Uygulamada admin paneli yoktur.
+- Tek giris ekrani `/login` adresidir.
+- Varsayilan yerel hesap `operator / ChangeMe123!` olarak seed edilir.
+- Kullanicilar sadece kendi birim verilerini gorebilir.
+- `/admin` ve `/admin/login` mevcut degildir.
+- QR indirme SVG olarak yapilir.

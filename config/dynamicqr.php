@@ -16,8 +16,8 @@ return [
         explode(',', (string) env('ALLOWED_QR_DOMAINS', 'yee.org.tr,gov.tr,youtube.com'))
     ))),
     'ip_hash_salt' => env('IP_HASH_SALT', 'dynamicqr-laravel-dev-salt'),
-    'super_admin_username' => (string) env('LDAP_SUPER_ADMIN_USERNAME', ''),
-    'local_super_admin_enabled' => filter_var(env('LOCAL_SUPER_ADMIN_ENABLED', true), FILTER_VALIDATE_BOOL),
-    'local_super_admin_username' => (string) env('LOCAL_SUPER_ADMIN_USERNAME', 'admin'),
-    'local_super_admin_password' => (string) env('LOCAL_SUPER_ADMIN_PASSWORD', 'ChangeMe123!'),
+    'global_access_email' => strtolower(trim((string) env('GLOBAL_ACCESS_EMAIL', 'webmaster@yee.org.tr'))),
+    'local_account_enabled' => filter_var(env('LOCAL_ACCOUNT_ENABLED', true), FILTER_VALIDATE_BOOL),
+    'local_account_username' => (string) env('LOCAL_ACCOUNT_USERNAME', 'operator'),
+    'local_account_password' => (string) env('LOCAL_ACCOUNT_PASSWORD', 'ChangeMe123!'),
 ];

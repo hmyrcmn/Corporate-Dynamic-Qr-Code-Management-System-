@@ -8,7 +8,6 @@
     <meta name="theme-color" content="#f4f7f8" id="theme-color-meta">
     <link rel="icon" type="image/png" href="{{ asset('img/yee-favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/yee-favicon.png') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/filament/filament/inter/index.css') }}">
     <script>
         (function () {
             const theme = localStorage.getItem('dynamicqr-theme');
@@ -63,31 +62,45 @@
                             <span data-theme-label class="hidden md:inline">Koyu tema</span>
                         </button>
 
-                            <a href="{{ route('login') }}" class="btn-brand px-4 py-2.5 text-[13px] md:px-5 md:py-2.5">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
-                                </svg>
-                                <span>Kurumsal Giriş</span>
-                            </a>
+                        <a href="{{ route('login') }}" class="btn-brand px-4 py-2.5 text-[13px] md:px-5 md:py-2.5">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
+                            </svg>
+                            <span>Kurumsal Giriş</span>
+                        </a>
                     </nav>
                 </div>
             </div>
         </header>
     @endguest
 
-        <div class="flex min-h-screen">
+    <div class="flex min-h-screen">
         @auth
+            @php
+                $authUser = auth()->user();
+                $sidebarDepartment = request()->route('department');
+                $hasGlobalDepartmentAccess = $authUser->hasGlobalDepartmentAccess();
+                $sidebarContextLabel = $hasGlobalDepartmentAccess && $sidebarDepartment
+                    ? $sidebarDepartment->name
+                    : $authUser->departmentContextLabel();
+                $newRecordUrl = $hasGlobalDepartmentAccess && $sidebarDepartment
+                    ? route('qr.department.create', $sidebarDepartment)
+                    : (! $hasGlobalDepartmentAccess ? route('qr.create') : null);
+                $newRecordActive = $hasGlobalDepartmentAccess
+                    ? request()->routeIs('qr.department.*')
+                    : request()->routeIs('qr.create', 'qr.edit', 'qr.delete.confirm');
+            @endphp
             <aside id="sidebar" data-sidebar class="sidebar-transition fixed inset-y-0 left-0 z-50 my-3 mr-3 ml-0 w-[16.25rem] -translate-x-[120%] rounded-[1.6rem] page-card apple-glass-heavy nav-shell lg:sticky lg:inset-y-auto lg:left-auto lg:top-6 lg:my-5 lg:mr-0 lg:ml-0 lg:h-[calc(100vh-2.5rem)] lg:w-[17.5rem] lg:translate-x-0 lg:self-start lg:rounded-[1.8rem]">
                 <div class="flex h-full flex-col p-4 lg:p-5">
                     <a href="{{ route('dashboard') }}" class="mb-5 block">
                         <div class="logo-shell w-full justify-start px-1 py-1">
-                            <img src="{{ asset('img/yee-logo.png') }}" alt="Yunus Emre Enstitusu logosu" class="brand-logo h-11">
+                            <img src="{{ asset('img/yee-logo.png') }}" alt="Yunus Emre Enstitüsü logosu" class="brand-logo h-11">
                         </div>
                         <div class="mt-4 px-1">
                             <div class="sidebar-intro">
                                 <div class="sidebar-intro-copy">
-                                    <span class="block truncate text-[0.78rem] font-semibold tracking-[0.01em] text-slate-500 dark:text-slate-400" title="{{ auth()->user()->hasGlobalAccess() ? 'Global Yonetim' : (auth()->user()->department?->name ?? 'Atanmamis Birim') }}">
-                                        {{ auth()->user()->hasGlobalAccess() ? 'Global Yonetim' : (auth()->user()->department?->name ?? 'Atanmamis Birim') }}
+                                    <span class="block truncate text-[0.78rem] font-semibold tracking-[0.01em] text-slate-500 dark:text-slate-400" title="{{ $sidebarContextLabel }}">
+                                        {{ $sidebarContextLabel }}
                                     </span>
                                 </div>
                                 <div class="sidebar-intro-badge" aria-hidden="true">
@@ -99,32 +112,25 @@
                             </div>
                             <h1 class="mt-3 text-[1rem] font-semibold text-brand-ink dark:text-white">Dinamik QR Paneli</h1>
                             <p class="mt-2.5 text-[0.88rem] leading-7 text-slate-600 dark:text-slate-300">
-                                Baglantilari yonetin, QR dosyalarini uretin ve taramalari izleyin.
+                                Bağlantıları yönetin, QR dosyalarını üretin ve taramaları izleyin.
                             </p>
                         </div>
                     </a>
 
                     <nav class="space-y-2">
-                        <a href="{{ route('dashboard') }}" class="nav-item-link {{ request()->routeIs('dashboard') ? 'is-active' : '' }}">
+                        <a href="{{ route('dashboard') }}" class="nav-item-link {{ request()->routeIs('dashboard', 'dashboard.department') ? 'is-active' : '' }}">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                             </svg>
-                            <span>Genel Bakis</span>
+                            <span>{{ $hasGlobalDepartmentAccess ? 'Birimler' : 'Genel Bakış' }}</span>
                         </a>
 
-                        <a href="{{ route('qr.create') }}" class="nav-item-link {{ request()->routeIs('qr.create', 'qr.edit', 'qr.delete.confirm') ? 'is-active' : '' }}">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            <span>Yeni Kayit</span>
-                        </a>
-
-                        @if (auth()->user()->hasGlobalAccess())
-                            <a href="{{ url('/admin') }}" class="nav-item-link">
+                        @if ($newRecordUrl)
+                            <a href="{{ $newRecordUrl }}" class="nav-item-link {{ $newRecordActive ? 'is-active' : '' }}">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7M9 11h6M9 15h4"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>
-                                <span>Filament Admin</span>
+                                <span>Yeni Kayıt</span>
                             </a>
                         @endif
                     </nav>
@@ -137,7 +143,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <p class="truncate text-[0.92rem] font-semibold text-brand-ink dark:text-white">{{ auth()->user()->name ?: auth()->user()->username }}</p>
-                                    <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">{{ auth()->user()->email ?: (auth()->user()->department?->name ?? 'Kurumsal kullanici') }}</p>
+                                    <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">{{ auth()->user()->email ?: (auth()->user()->department?->name ?? 'Kurumsal kullanıcı') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +167,7 @@
         <div class="flex min-w-0 flex-1 flex-col">
             @auth
                 <div class="hidden px-6 pt-6 lg:flex lg:justify-end">
-                    <button type="button" class="theme-toggle px-5 py-3" data-theme-toggle aria-label="Temayi degistir">
+                    <button type="button" class="theme-toggle px-5 py-3" data-theme-toggle aria-label="Temayı değiştir">
                         <svg data-theme-icon="light" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m7-9h2M3 12H5m12.364 6.364 1.414 1.414M5.222 5.222l1.414 1.414m0 10.728-1.414 1.414m12.728-12.728-1.414 1.414M12 16a4 4 0 100-8 4 4 0 000 8z"></path>
                         </svg>
@@ -181,10 +187,10 @@
                         </button>
 
                         <a href="{{ route('dashboard') }}" class="logo-shell px-4 py-2.5">
-                            <img src="{{ asset('img/yee-logo.png') }}" alt="Yunus Emre Enstitusu logosu" class="brand-logo h-7">
+                            <img src="{{ asset('img/yee-logo.png') }}" alt="Yunus Emre Enstitüsü logosu" class="brand-logo h-7">
                         </a>
 
-                        <button type="button" class="theme-toggle h-11 w-11 p-0" data-theme-toggle aria-label="Temayi degistir">
+                        <button type="button" class="theme-toggle h-11 w-11 p-0" data-theme-toggle aria-label="Temayı değiştir">
                             <svg data-theme-icon="light" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m7-9h2M3 12H5m12.364 6.364 1.414 1.414M5.222 5.222l1.414 1.414m0 10.728-1.414 1.414m12.728-12.728-1.414 1.414M12 16a4 4 0 100-8 4 4 0 000 8z"></path>
                             </svg>
@@ -213,7 +219,7 @@
                     <footer class="px-4 pb-4 pt-2 md:px-6 md:pb-5 md:pt-3 lg:px-8">
                         <div class="mx-auto max-w-7xl">
                             <div class="page-card apple-glass rounded-[1.5rem] px-5 py-3 text-center">
-                                <p class="text-sm font-semibold text-brand-ink dark:text-white">Yunus Emre Enstitusu</p>
+                                <p class="text-sm font-semibold text-brand-ink dark:text-white">Yunus Emre Enstitüsü</p>
                                 <p class="mt-1 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
                                     Dinamik QR Platformu - 2026
                                 </p>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Yonetim Paneli | Dinamik QR')
+@section('title', 'Yönetim Paneli | Dinamik QR')
 
 @push('styles')
     <style>
@@ -424,37 +424,45 @@
 @endpush
 
 @section('content')
+    @php
+        $downloadUrlTemplate = $globalDepartmentMode
+            ? route('qr.department.download', ['department' => $selectedDepartment, 'shortId' => '__SHORT_ID__'])
+            : route('qr.download', ['shortId' => '__SHORT_ID__']);
+    @endphp
     <section class="dashboard-shell page-shell flex flex-col gap-2.5 pb-2">
         <div class="dashboard-top">
             <div class="dashboard-title-area">
                 <span class="eyebrow">Kontrol paneli</span>
                 <h2 class="sf-display mt-2 text-[1.8rem] font-extrabold tracking-[-0.06em] text-brand-ink dark:text-white md:text-[2.2rem]">
-                    QR Yonetimi
+                    QR Yönetimi
                 </h2>
                 <p class="mt-1.5 text-[0.82rem] leading-6 text-slate-600 dark:text-slate-300">
-                    <span class="dashboard-department font-semibold">{{ $departmentName }}</span> icin baglantilari yonetin ve listeyi hizla daraltin.
+                    <span class="dashboard-department font-semibold">{{ $departmentName }}</span> için bağlantıları yönetin ve listeyi hızla daraltın.
                 </p>
             </div>
 
             <div class="dashboard-action-rail">
-                <div class="month-mark dashboard-counter-pill text-[0.72rem]">Gorunen kayit: {{ $filteredQrCount }}</div>
-                @if ($filtersActive)
-                    <a href="{{ $resetFilterUrl }}" class="ghost-button px-3.5 py-2 text-[0.8rem]">Tumunu Goster</a>
+                <div class="month-mark dashboard-counter-pill text-[0.72rem]">Görünen kayıt: {{ $filteredQrCount }}</div>
+                @if ($departmentHubUrl)
+                    <a href="{{ $departmentHubUrl }}" class="ghost-button px-3.5 py-2 text-[0.8rem]">Birimlere Dön</a>
                 @endif
-                <a href="{{ route('qr.create') }}" class="brand-button px-5 py-3 text-[0.9rem] shadow-lg shadow-cyan-500/20">
+                @if ($filtersActive)
+                    <a href="{{ $resetFilterUrl }}" class="ghost-button px-3.5 py-2 text-[0.8rem]">Tümünü Göster</a>
+                @endif
+                <a href="{{ $createUrl }}" class="brand-button px-5 py-3 text-[0.9rem] shadow-lg shadow-cyan-500/20">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    <span>Yeni Baglanti</span>
+                    <span>Yeni Bağlantı</span>
                 </a>
             </div>
         </div>
 
         <div class="dashboard-metrics">
-            <a href="{{ $activeFilterUrl }}#qr-list" class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $activeFilterSelected ? 'is-active' : '' }}" aria-label="Aktif baglantilari filtrele">
+            <a href="{{ $activeFilterUrl }}#qr-list" class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $activeFilterSelected ? 'is-active' : '' }}" aria-label="Aktif bağlantıları filtrele">
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Aktif baglantilar</p>
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Aktif bağlantılar</p>
                         <div class="dashboard-metric-value">{{ $activeQrCount }}</div>
                     </div>
                     <div class="dashboard-metric-icon">
@@ -465,12 +473,12 @@
                 </div>
 
                 <p class="dashboard-metric-copy">
-                    Yayindaki kayitlari ayirir.
+                    Yayındaki kayıtları ayırır.
                 </p>
                
             </a>
 
-            <a href="{{ $scannedFilterUrl }}#qr-list" class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $scannedFilterSelected ? 'is-active' : '' }}" aria-label="Taranan kayitlari filtrele">
+            <a href="{{ $scannedFilterUrl }}#qr-list" class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $scannedFilterSelected ? 'is-active' : '' }}" aria-label="Taranan kayıtları filtrele">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Toplam tarama</p>
@@ -484,7 +492,7 @@
                 </div>
 
                 <p class="dashboard-metric-copy">
-                    Taranan kayitlari one alir.
+                    Taranan kayıtları öne alır.
                 </p>
                 
             </a>
@@ -496,18 +504,18 @@
                     <span class="surface-chip inline-flex text-cyan-600 bg-cyan-500/10 dark:text-cyan-400 items-center rounded-full px-3.5 py-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300">
                         {{ $filterTitle }}
                     </span>
-                    <h3 class="mt-2 text-[1.18rem] font-bold tracking-[-0.05em] text-brand-ink dark:text-white">Kayitli Baglantilar</h3>
+                    <h3 class="mt-2 text-[1.18rem] font-bold tracking-[-0.05em] text-brand-ink dark:text-white">Kayıtlı Bağlantılar</h3>
                     <p class="dashboard-head-copy">{{ $filterDescription }}</p>
                 </div>
             </div>
 
             <div class="dashboard-list-scroll mt-3">
                 <div class="dashboard-table-head text-[0.78rem] font-extrabold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
-                    <span>Baglanti</span>
+                    <span>Bağlantı</span>
                     <span>Kod</span>
                     <span>Hedef URL</span>
                     <span>Tarama</span>
-                    <span>Islemler</span>
+                    <span>İşlemler</span>
                 </div>
 
                 <div class="space-y-2">
@@ -537,23 +545,23 @@
                             </div>
 
                             <div class="dashboard-action-grid">
-                                <button type="button" onclick="openQRModal('{{ $qrCode->short_id }}', @js($qrCode->title))" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Goruntule">
+                                <button type="button" onclick="openQRModal('{{ $qrCode->short_id }}', @js($qrCode->title))" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Görüntüle">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
                                 </button>
-                                <a href="{{ route('qr.download', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Indir">
+                                <a href="{{ $globalDepartmentMode ? route('qr.department.download', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.download', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="İndir">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                     </svg>
                                 </a>
-                                <a href="{{ route('qr.edit', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Duzenle">
+                                <a href="{{ $globalDepartmentMode ? route('qr.department.edit', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.edit', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Düzenle">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>
                                 </a>
-                                <a href="{{ route('qr.delete.confirm', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Sil">
+                                <a href="{{ $globalDepartmentMode ? route('qr.department.delete.confirm', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.delete.confirm', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Sil">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
@@ -569,8 +577,8 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="text-lg font-semibold text-brand-ink dark:text-white">Henuz kayit bulunmuyor</p>
-                                    <p class="mt-2 text-[0.92rem] leading-7 text-slate-600 dark:text-slate-300">Ilk baglantinizi olusturarak baslayin.</p>
+                                    <p class="text-lg font-semibold text-brand-ink dark:text-white">Henüz kayıt bulunmuyor</p>
+                                    <p class="mt-2 text-[0.92rem] leading-7 text-slate-600 dark:text-slate-300">İlk bağlantınızı oluşturarak başlayın.</p>
                                 </div>
                             </div>
                         </div>
@@ -589,23 +597,26 @@
     <div id="qr-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <div id="qr-modal-backdrop" class="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 backdrop-blur-sm transition-opacity" onclick="closeQRModal()"></div>
 
-        <div id="qr-modal-content" class="page-card apple-glass-panel relative z-10 flex w-full max-w-sm scale-95 flex-col items-center rounded-[2.5rem] border border-white p-8 text-center opacity-0 shadow-[0_24px_80px_rgba(16,32,42,0.16)] transition-all duration-300 dark:border-white/10">
+        <div id="qr-modal-content" class="page-card apple-glass-panel relative z-10 flex w-full max-w-md scale-95 flex-col items-center rounded-[2.5rem] border border-white p-8 text-center opacity-0 shadow-[0_24px_80px_rgba(16,32,42,0.16)] transition-all duration-300 dark:border-white/10">
             <button type="button" onclick="closeQRModal()" class="absolute right-4 top-4 rounded-full bg-white/50 p-2 text-slate-500 transition hover:bg-white hover:text-brand-ink dark:bg-white/8 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
 
-            <h3 id="qr-modal-title" class="mb-6 line-clamp-2 text-xl font-bold leading-tight text-brand-ink dark:text-white">Yukleniyor...</h3>
+            <h3 id="qr-modal-title" class="mb-6 line-clamp-2 text-xl font-bold leading-tight text-brand-ink dark:text-white">Yükleniyor...</h3>
+            <p class="-mt-3 mb-5 text-[0.72rem] font-extrabold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                Yunus Emre Enstitüsü kurumsal QR kartı
+            </p>
 
-            <div class="relative mb-6 flex aspect-square w-full items-center justify-center rounded-[1.75rem] border border-black/5 bg-white p-4 shadow-inner dark:border-white/10 dark:bg-white/5">
+            <div class="relative mb-6 flex aspect-[5/6] w-full items-center justify-center rounded-[1.9rem] border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(239,248,249,0.9))] p-4 shadow-inner dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(18,188,200,0.08))]">
                 <div id="qr-modal-loader" class="absolute inset-0 flex items-center justify-center">
                     <span class="relative flex h-3 w-3">
                         <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-500 opacity-75"></span>
                         <span class="relative inline-flex h-3 w-3 rounded-full bg-cyan-500"></span>
                     </span>
                 </div>
-                <img id="qr-modal-img" src="" alt="QR kod" class="hidden h-full w-full rounded-xl object-contain">
+                <img id="qr-modal-img" src="" alt="QR kod" class="hidden h-full w-full rounded-[1.4rem] object-contain">
             </div>
 
             <div class="flex w-full flex-col gap-3">
@@ -613,7 +624,7 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    <span>QR Gorselini Indir</span>
+                    <span>Kurumsal QR İndir</span>
                 </a>
                 <button type="button" onclick="closeQRModal()" class="ghost-button px-6 py-3.5 text-sm">Kapat</button>
             </div>
@@ -623,6 +634,8 @@
 
 @push('scripts')
     <script>
+        const qrDownloadUrlTemplate = @js($downloadUrlTemplate);
+
         function openQRModal(shortId, title) {
             const modal = document.getElementById('qr-modal');
             const backdrop = document.getElementById('qr-modal-backdrop');
@@ -634,9 +647,10 @@
 
             imgEl.classList.add('hidden');
             loader.classList.remove('hidden');
+            titleEl.classList.remove('text-rose-500');
             titleEl.textContent = title;
-            imgEl.src = "{{ url('/download-qr') }}/" + shortId + '?inline=1';
-            downloadBtn.href = "{{ url('/download-qr') }}/" + shortId;
+            downloadBtn.href = qrDownloadUrlTemplate.replace('__SHORT_ID__', shortId);
+            imgEl.src = downloadBtn.href + '?inline=1';
 
             imgEl.onload = function () {
                 loader.classList.add('hidden');
@@ -645,7 +659,7 @@
             imgEl.onerror = function () {
                 loader.classList.add('hidden');
                 imgEl.classList.add('hidden');
-                titleEl.textContent = 'Gorsel Yuklenemedi (Tarayici veya Sunucu Hatasi)';
+                titleEl.textContent = 'Görsel yüklenemedi (tarayıcı veya sunucu hatası)';
                 titleEl.classList.add('text-rose-500');
             };
 

@@ -58,7 +58,7 @@ class QrCode extends Model
 
     public function scopeAccessibleTo(Builder $query, User $user): Builder
     {
-        if ($user->hasGlobalAccess()) {
+        if ($user->hasGlobalDepartmentAccess()) {
             return $query;
         }
 

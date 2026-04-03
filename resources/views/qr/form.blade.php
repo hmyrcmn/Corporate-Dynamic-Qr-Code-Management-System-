@@ -411,9 +411,9 @@
     <section class="qr-form-page page-shell page-shell-md pb-3 lg:flex">
         <div class="qr-form-shell">
             <div class="qr-form-breadcrumb">
-                <span>Yonetim Paneli</span>
+                <span>Yönetim Paneli</span>
                 <span>/</span>
-                <span class="qr-form-breadcrumb-current">{{ $qrCode->exists ? 'Kayit Duzenle' : 'Yeni Kayit' }}</span>
+                <span class="qr-form-breadcrumb-current">{{ $qrCode->exists ? 'Kaydı Düzenle' : 'Yeni Kayıt' }}</span>
             </div>
 
             <div class="qr-form-card apple-glass-panel mt-3">
@@ -434,7 +434,7 @@
                         <div class="min-w-0">
                             <h1 class="qr-form-title sf-display font-extrabold text-brand-ink dark:text-white">{{ $pageTitle }}</h1>
                             <p class="qr-form-copy mt-2.5 text-slate-600 dark:text-slate-300">
-                                Sistem uzerinde yonlendirilecek {{ $qrCode->exists ? 'kaydi guncelleyin' : 'yeni bir baglanti olusturun' }}. Hedef URL ve diger bilgileri eksiksiz doldurunuz.
+                                Sistem üzerinde yönlendirilecek {{ $qrCode->exists ? 'kaydı güncelleyin' : 'yeni bir bağlantı oluşturun' }}. Hedef URL ve diğer bilgileri eksiksiz doldurun.
                             </p>
                         </div>
                     </div>
@@ -453,27 +453,24 @@
                             @method('PUT')
                         @endif
 
-                        <div class="qr-form-stack">
-                            @if(auth()->user()->hasGlobalAccess())
-                                <div class="col-span-full mb-1">
-                                    <label for="department_id" class="qr-form-field-label">Birim (Admin)</label>
-                                    <select id="department_id" name="department_id" required class="field-shell qr-form-input appearance-none bg-no-repeat bg-[right_1.25rem_center] bg-[length:1.2em_1.2em]" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22currentColor%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22/%3E%3C/svg%3E');">
-                                        <option value="">Birim Seciniz</option>
-                                        @foreach($departments as $dept)
-                                            <option value="{{ $dept->id }}" @selected(old('department_id', $qrCode->department_id) == $dept->id)>
-                                                {{ $dept->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('department_id')
-                                        <span class="mt-1 block text-[0.78rem] font-semibold text-rose-500">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            @endif
+                        <div class="surface-panel qr-form-meta-card mb-4">
+                            <p class="field-label mb-2">İşlem birimi</p>
+                            <p class="text-[0.92rem] font-semibold text-brand-ink dark:text-white">
+                                {{ $selectedDepartment?->name ?? 'Atanmamış Birim' }}
+                            </p>
+                            <p class="mt-1 text-[0.78rem] leading-6 text-slate-600 dark:text-slate-300">
+                                @if (auth()->user()->hasGlobalDepartmentAccess())
+                                    Bu form sadece seçilen birim için çalışır.
+                                @else
+                                    Bu hesap yalnızca kendi birimi için kayıt yönetebilir.
+                                @endif
+                            </p>
+                        </div>
 
+                        <div class="qr-form-stack">
                             <div>
-                                <label for="title" class="qr-form-field-label">Baslik</label>
-                                <input type="text" id="title" name="title" required maxlength="255" value="{{ old('title', $qrCode->title) }}" class="field-shell qr-form-input" placeholder="Orn: Yaz Kursu Katalogu">
+                                <label for="title" class="qr-form-field-label">Başlık</label>
+                                <input type="text" id="title" name="title" required maxlength="255" value="{{ old('title', $qrCode->title) }}" class="field-shell qr-form-input" placeholder="Örn: Yaz Kursu Kataloğu">
                             </div>
 
                             <div>
@@ -485,14 +482,14 @@
                         @if ($qrCode->exists)
                             <div class="qr-form-meta">
                                 <div class="surface-panel qr-form-meta-card">
-                                    <p class="field-label mb-2">Kisa kod</p>
-                                    <p class="text-[0.84rem] font-semibold text-brand-ink dark:text-white">{{ $qrCode->short_id ?: 'Otomatik uretilecek' }}</p>
+                                    <p class="field-label mb-2">Kısa kod</p>
+                                    <p class="text-[0.84rem] font-semibold text-brand-ink dark:text-white">{{ $qrCode->short_id ?: 'Otomatik üretilecek' }}</p>
                                 </div>
 
                                 <label class="surface-panel qr-form-meta-card qr-form-status cursor-pointer">
                                     <div>
                                         <p class="field-label mb-2">Durum</p>
-                                        <p class="text-[0.84rem] font-semibold text-brand-ink dark:text-white">Yayinda tut</p>
+                                        <p class="text-[0.84rem] font-semibold text-brand-ink dark:text-white">Yayında tut</p>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <input type="hidden" name="is_active" value="0">
@@ -512,22 +509,26 @@
                                 </svg>
                             </button>
 
-                            <a href="{{ route('dashboard') }}" class="ghost-button qr-form-cancel">Iptal</a>
+                            <a href="{{ $backUrl }}" class="ghost-button qr-form-cancel">İptal</a>
                         </div>
 
                         @if ($qrCode->exists)
                             <div class="qr-form-tools soft-card rounded-[1.05rem] p-3">
                                 <div class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
                                     <div>
-                                        <p class="text-[0.82rem] font-semibold text-brand-ink dark:text-white">Kayit bilgisi</p>
+                                        <p class="text-[0.82rem] font-semibold text-brand-ink dark:text-white">Kayıt bilgisi</p>
                                         <p class="mt-1 text-[0.76rem] text-slate-600 dark:text-slate-300">
-                                            Birim: {{ $qrCode->department?->name ?? 'Atanmamis' }} &middot; Olusturan: {{ $qrCode->creator?->name ?? $qrCode->creator?->username ?? 'Bilinmiyor' }}
+                                            Birim: {{ $qrCode->department?->name ?? 'Atanmamış' }} &middot; Oluşturan: {{ $qrCode->creator?->name ?? $qrCode->creator?->username ?? 'Bilinmiyor' }}
                                         </p>
                                     </div>
 
                                     <div class="flex flex-wrap gap-2.5">
-                                        <a href="{{ route('qr.download', $qrCode->short_id) }}" class="ghost-button px-3.5 py-2 text-[0.78rem]">QR Indir</a>
-                                        <a href="{{ route('qr.delete.confirm', $qrCode->short_id) }}" class="danger-button px-3.5 py-2 text-[0.78rem]">Kaydi Sil</a>
+                                        @if ($downloadUrl)
+                                            <a href="{{ $downloadUrl }}" class="ghost-button px-3.5 py-2 text-[0.78rem]">QR İndir</a>
+                                        @endif
+                                        @if ($deleteConfirmUrl)
+                                            <a href="{{ $deleteConfirmUrl }}" class="danger-button px-3.5 py-2 text-[0.78rem]">Kaydı Sil</a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

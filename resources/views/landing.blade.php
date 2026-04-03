@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dinamik QR Yonetim Platformu')
+@section('title', 'Dinamik QR Yönetim Platformu')
 
 @push('styles')
     <style>

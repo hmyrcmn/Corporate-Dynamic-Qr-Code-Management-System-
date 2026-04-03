@@ -150,8 +150,6 @@ class LdapDirectoryAuthenticator
             })
             ->first() ?? new User();
 
-        $superAdminUsername = LdapUsername::normalize((string) config('dynamicqr.super_admin_username'));
-
         $user->forceFill([
             'guid' => $directoryUser['guid'] ?: $user->guid,
             'domain' => $directoryUser['domain'] ?: $user->domain,
@@ -159,9 +157,7 @@ class LdapDirectoryAuthenticator
             'name' => $directoryUser['name'] !== '' ? $directoryUser['name'] : $user->name,
             'email' => $directoryUser['email'] !== '' ? $directoryUser['email'] : $user->email,
             'department_id' => $department?->id,
-            'role' => ($superAdminUsername !== '' && strcasecmp($directoryUser['username'], $superAdminUsername) === 0)
-                ? UserRole::SUPER_ADMIN->value
-                : UserRole::DEPT_USER->value,
+            'role' => UserRole::DEPT_USER->value,
             'is_active' => (bool) ($directoryUser['is_active'] ?? true),
         ])->saveQuietly();
 

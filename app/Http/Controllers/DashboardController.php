@@ -2,33 +2,78 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\QrCode;
 use App\Models\ScanAnalytics;
+use App\Models\User;
+use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function index(Request $request): ViewContract
     {
         $user = $request->user();
+
+        if ($user->hasGlobalDepartmentAccess()) {
+            return $this->renderDepartmentHub();
+        }
+
+        return $this->renderDepartmentDashboard($request, $user, $user->department);
+    }
+
+    public function showDepartment(Request $request, Department $department): ViewContract
+    {
+        $user = $request->user();
+
+        abort_unless($user->hasGlobalDepartmentAccess(), 404);
+
+        return $this->renderDepartmentDashboard($request, $user, $department);
+    }
+
+    private function renderDepartmentHub(): ViewContract
+    {
+        $scanCounts = ScanAnalytics::query()
+            ->join('qr_codes', 'qr_codes.id', '=', 'scan_analytics.qr_code_id')
+            ->selectRaw('qr_codes.department_id, COUNT(scan_analytics.id) as scans_count')
+            ->groupBy('qr_codes.department_id')
+            ->pluck('scans_count', 'qr_codes.department_id');
+
+        $departments = Department::query()
+            ->withCount([
+                'qrCodes',
+                'qrCodes as active_qr_codes_count' => fn (Builder $query) => $query->where('is_active', true),
+            ])
+            ->orderBy('name')
+            ->get()
+            ->map(function (Department $department) use ($scanCounts): Department {
+                $department->setAttribute('scans_count', (int) ($scanCounts[$department->id] ?? 0));
+
+                return $department;
+            });
+
+        return view('dashboard.departments', [
+            'departments' => $departments,
+        ]);
+    }
+
+    private function renderDepartmentDashboard(Request $request, User $user, ?Department $department): ViewContract
+    {
+        abort_if(! $department, 404);
+
         $activeSelected = $request->boolean('active');
         $scannedSelected = $request->boolean('scanned');
 
         $summary = Cache::remember(
-            sprintf('dashboard-summary:%s', $user->getAuthIdentifier()),
+            sprintf('dashboard-summary:%s:%s', $user->getAuthIdentifier(), $department->id),
             now()->addSeconds(30),
-            function () use ($user): array {
-                $accessibleQrCodes = QrCode::query()->accessibleTo($user);
+            function () use ($user, $department): array {
+                $accessibleQrCodes = $this->scopedQrCodesQuery($user, $department);
 
                 $totalScans = ScanAnalytics::query()
-                    ->join('qr_codes', 'qr_codes.id', '=', 'scan_analytics.qr_code_id')
-                    ->when(
-                        ! $user->hasGlobalAccess(),
-                        fn (Builder $query): Builder => $query->where('qr_codes.department_id', $user->department_id ?? 0),
-                    )
+                    ->whereIn('qr_code_id', (clone $accessibleQrCodes)->select('qr_codes.id'))
                     ->count();
 
                 return [
@@ -40,13 +85,12 @@ class DashboardController extends Controller
         );
 
         $qrCodesQuery = $this->applyFilters(
-            QrCode::query()
+            $this->scopedQrCodesQuery($user, $department)
                 ->with([
                     'department:id,name',
                     'creator:id,name,username',
                 ])
-                ->withCount('scans')
-                ->accessibleTo($user),
+                ->withCount('scans'),
             $activeSelected,
             $scannedSelected,
         );
@@ -63,20 +107,25 @@ class DashboardController extends Controller
         $filteredQrCount = $qrCodes->total();
 
         if ($activeSelected && $scannedSelected) {
-            $filterTitle = 'Aktif ve taranan kayitlar';
-            $filterDescription = 'Yalnizca aktif olan ve en az bir kez taranan baglantilar listeleniyor.';
+            $filterTitle = 'Aktif ve taranan kayıtlar';
+            $filterDescription = 'Yalnızca aktif olan ve en az bir kez taranan bağlantılar listeleniyor.';
         } elseif ($activeSelected) {
-            $filterTitle = 'Aktif kayitlar';
-            $filterDescription = 'Sadece yayinda kalan baglantilar gorunuyor.';
+            $filterTitle = 'Aktif kayıtlar';
+            $filterDescription = 'Sadece yayında kalan bağlantılar görünüyor.';
         } elseif ($scannedSelected) {
-            $filterTitle = 'Taranan kayitlar';
-            $filterDescription = 'En az bir kez taranan baglantilar one cikiyor.';
+            $filterTitle = 'Taranan kayıtlar';
+            $filterDescription = 'En az bir kez taranan bağlantılar öne çıkıyor.';
         } else {
-            $filterTitle = 'Tum kayitlar';
-            $filterDescription = 'Tum baglantilar, hedef adresler ve islemler tek alanda listelenir.';
+            $filterTitle = 'Tüm kayıtlar';
+            $filterDescription = 'Tüm bağlantılar, hedef adresler ve işlemler tek alanda listelenir.';
         }
 
+        $dashboardRoute = $user->hasGlobalDepartmentAccess()
+            ? route('dashboard.department', $department)
+            : route('dashboard');
+
         return view('dashboard.index', [
+            'selectedDepartment' => $department,
             'qrCodes' => $qrCodes,
             'allQrCount' => $summary['allQrCount'],
             'activeQrCount' => $summary['activeQrCount'],
@@ -87,19 +136,41 @@ class DashboardController extends Controller
             'activeFilterSelected' => $activeSelected,
             'scannedFilterSelected' => $scannedSelected,
             'filtersActive' => $activeSelected || $scannedSelected,
-            'activeFilterUrl' => route('dashboard', array_filter([
-                'active' => $activeSelected ? null : 1,
-                'scanned' => $scannedSelected ? 1 : null,
-            ])),
-            'scannedFilterUrl' => route('dashboard', array_filter([
-                'active' => $activeSelected ? 1 : null,
-                'scanned' => $scannedSelected ? null : 1,
-            ])),
-            'resetFilterUrl' => route('dashboard'),
-            'departmentName' => $user->hasGlobalAccess()
-                ? 'Tum Birimler'
-                : ($user->department?->name ?? 'Atanmamis Birim'),
+            'activeFilterUrl' => $this->filterUrl($dashboardRoute, [
+                'active' => ! $activeSelected,
+                'scanned' => $scannedSelected,
+            ]),
+            'scannedFilterUrl' => $this->filterUrl($dashboardRoute, [
+                'active' => $activeSelected,
+                'scanned' => ! $scannedSelected,
+            ]),
+            'resetFilterUrl' => $this->filterUrl($dashboardRoute, []),
+            'departmentName' => $department->name,
+            'createUrl' => $user->hasGlobalDepartmentAccess()
+                ? route('qr.department.create', $department)
+                : route('qr.create'),
+            'departmentHubUrl' => $user->hasGlobalDepartmentAccess()
+                ? route('dashboard')
+                : null,
+            'globalDepartmentMode' => $user->hasGlobalDepartmentAccess(),
         ]);
+    }
+
+    /**
+     * @param  array<string, bool>  $filters
+     */
+    private function filterUrl(string $dashboardRoute, array $filters): string
+    {
+        $query = collect($filters)
+            ->filter()
+            ->map(fn (bool $value): string => $value ? '1' : '0')
+            ->all();
+
+        if ($query === []) {
+            return $dashboardRoute;
+        }
+
+        return $dashboardRoute.'?'.http_build_query($query);
     }
 
     private function applyFilters(Builder $query, bool $activeSelected, bool $scannedSelected): Builder
@@ -113,5 +184,12 @@ class DashboardController extends Controller
         }
 
         return $query;
+    }
+
+    private function scopedQrCodesQuery(User $user, Department $department): Builder
+    {
+        return QrCode::query()
+            ->accessibleTo($user)
+            ->where('department_id', $department->id);
     }
 }

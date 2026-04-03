@@ -8,7 +8,6 @@
     <meta name="theme-color" content="#eef4f4" id="theme-color-meta">
     <link rel="icon" type="image/png" href="{{ asset('img/yee-favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/yee-favicon.png') }}">
-    <link rel="stylesheet" href="{{ asset('fonts/filament/filament/inter/index.css') }}">
     <script>
         (function () {
             const theme = localStorage.getItem('dynamicqr-theme');
@@ -437,7 +436,7 @@
     <main class="login-viewport flex items-center justify-center px-4 py-4 md:px-5 md:py-5 lg:px-6 lg:py-6">
         <div class="login-shell w-full">
             <div class="mb-3 flex justify-end md:mb-4">
-                <button type="button" class="theme-toggle px-4 py-2.5" data-theme-toggle aria-label="Temayi degistir">
+                <button type="button" class="theme-toggle px-4 py-2.5" data-theme-toggle aria-label="Temayı değiştir">
                     <svg data-theme-icon="light" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m7-9h2M3 12H5m12.364 6.364 1.414 1.414M5.222 5.222l1.414 1.414m0 10.728-1.414 1.414m12.728-12.728-1.414 1.414M12 16a4 4 0 100-8 4 4 0 000 8z"></path>
                     </svg>
@@ -454,16 +453,16 @@
 
                     <div class="login-brand-content relative z-10">
                         <div class="logo-plinth w-fit px-2 py-1">
-                            <img src="{{ asset('img/yee-logo.png') }}" alt="Yunus Emre Enstitusu logosu" class="brand-logo login-logo">
+                            <img src="{{ asset('img/yee-logo.png') }}" alt="Yunus Emre Enstitüsü logosu" class="brand-logo login-logo">
                         </div>
 
                         <div class="login-brand-top mt-6 max-w-[22rem]">
-                            <span class="eyebrow text-cyan-100/80">Kurumsal erisim</span>
+                            <span class="eyebrow text-cyan-100/80">Kurumsal erişim</span>
                             <h1 class="login-compact-title sf-display mt-3 text-[2rem] font-extrabold leading-[0.98] tracking-[-0.07em] text-white md:text-[2.55rem]">
-                                Guvenli personel girisi
+                                Güvenli personel girişi
                             </h1>
                             <p class="login-compact-copy mt-3 max-w-[21rem] text-[0.87rem] leading-6 text-white/74">
-                                Dinamik QR paneline yetkili hesabinizla erisin ve yonetimi tek ekrandan surdurun.
+                                Dinamik QR paneline yetkili hesabınızla erişin ve yönetimi tek ekrandan sürdürün.
                             </p>
                         </div>
 
@@ -475,7 +474,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
                                         </svg>
                                     </div>
-                                    <p class="login-brand-note">Yetkili kurumsal erisim</p>
+                                    <p class="login-brand-note">Yetkili kurumsal erişim</p>
                                 </div>
 
                                 <div class="login-brand-card brand-panel-card flex items-center gap-3 rounded-[1.3rem]">
@@ -484,7 +483,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h7"></path>
                                         </svg>
                                     </div>
-                                    <p class="login-brand-note">Baglanti ve QR yonetimi tek panelde</p>
+                                    <p class="login-brand-note">Bağlantı ve QR yönetimi tek panelde</p>
                                 </div>
                             </div>
                         </div>
@@ -494,12 +493,12 @@
                 <section class="login-form-panel page-card glass-panel rounded-[1.95rem]">
                     <div class="login-form-shell">
                         <div class="max-w-[23rem]">
-                            <span class="login-eyebrow">Personel girisi</span>
+                            <span class="login-eyebrow">Personel girişi</span>
                             <h2 class="login-form-title sf-display mt-3 text-[1.95rem] font-extrabold tracking-[-0.07em] text-brand-ink dark:text-white md:text-[2.45rem]">
-                                Kurumsal kimliginizle devam edin
+                                Kurumsal kimliğinizle devam edin
                             </h2>
                             <p class="login-form-copy mt-3 max-w-[22rem] text-[0.88rem] leading-6 text-slate-600 dark:text-slate-300">
-                                Erisim yalnizca yetkili kullanicilar icindir. Tum oturum hareketleri guvenlik kayitlarina islenir.
+                                Erişim yalnızca yetkili kullanıcılar içindir. Tüm oturum hareketleri güvenlik kayıtlarına işlenir.
                             </p>
                         </div>
 
@@ -518,15 +517,15 @@
                             </div>
 
                             <div>
-                                <label for="password" class="field-label">Sifre</label>
-                                <input type="password" name="password" id="password" required autocomplete="current-password" class="input-shell login-input" placeholder="Sifrenizi girin">
+                                <label for="password" class="field-label">Şifre</label>
+                                <input type="password" name="password" id="password" required autocomplete="current-password" class="input-shell login-input" placeholder="Şifrenizi girin">
                             </div>
 
-                            <button type="submit" class="primary-button login-primary w-full">Guvenli Giris Yap</button>
+                            <button type="submit" class="primary-button login-primary w-full">Güvenli Giriş Yap</button>
                         </form>
 
                         <div class="login-footer mt-auto flex flex-col gap-3 pt-5 text-sm text-slate-500 dark:text-slate-400 md:flex-row md:items-center md:justify-between">
-                            <a href="{{ route('landing') }}" class="login-return-link" aria-label="Ana sayfaya don">
+                            <a href="{{ route('landing') }}" class="login-return-link" aria-label="Ana sayfaya dön">
                                 <span class="login-return-link-arrow" aria-hidden="true">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5l-7 7 7 7"></path>
@@ -541,7 +540,7 @@
                                     </svg>
                                 </span>
                             </a>
-                            <span class="text-[0.64rem] font-medium uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Tum erisimler kayit altindadir</span>
+                            <span class="text-[0.64rem] font-medium uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Tüm erişimler kayıt altındadır</span>
                         </div>
                     </div>
                 </section>

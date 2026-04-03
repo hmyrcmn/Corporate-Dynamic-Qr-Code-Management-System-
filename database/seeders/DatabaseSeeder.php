@@ -15,31 +15,43 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! config('dynamicqr.local_super_admin_enabled')) {
+        User::query()
+            ->whereNotIn('role', [
+                UserRole::DEPT_MANAGER->value,
+                UserRole::DEPT_USER->value,
+            ])
+            ->update(['role' => UserRole::DEPT_MANAGER->value]);
+
+        if (! config('dynamicqr.local_account_enabled')) {
             return;
         }
 
-        $localUsername = LdapUsername::normalize((string) config('dynamicqr.local_super_admin_username'));
-        $ldapSuperAdminUsername = LdapUsername::normalize((string) config('dynamicqr.super_admin_username'));
-        $seedAsSuperAdmin = $ldapSuperAdminUsername === '' || strcasecmp($ldapSuperAdminUsername, $localUsername) === 0;
+        $localUsername = LdapUsername::normalize((string) config('dynamicqr.local_account_username'));
 
         $department = Department::firstOrCreate(
             ['name' => 'Bilgi Teknolojileri'],
             ['is_active' => true],
         );
 
-        User::updateOrCreate(
-            ['username' => $localUsername],
-            [
-                'name' => $seedAsSuperAdmin ? 'Yerel Super Admin' : 'Yerel Acil Durum Hesabi',
-                'email' => 'admin@dynamicqr.local',
-                'password' => config('dynamicqr.local_super_admin_password'),
-                'department_id' => $department->id,
-                'role' => $seedAsSuperAdmin
-                    ? UserRole::SUPER_ADMIN->value
-                    : UserRole::DEPT_MANAGER->value,
-                'is_active' => true,
-            ],
-        );
+        $user = User::query()
+            ->where('username', $localUsername)
+            ->orWhere('email', 'operator@dynamicqr.local')
+            ->orWhere(function ($query): void {
+                $query
+                    ->whereNull('guid')
+                    ->whereNull('domain')
+                    ->where('email', 'like', '%@dynamicqr.local');
+            })
+            ->first() ?? new User();
+
+        $user->forceFill([
+            'name' => 'Yerel Kullanici',
+            'username' => $localUsername,
+            'email' => 'operator@dynamicqr.local',
+            'password' => config('dynamicqr.local_account_password'),
+            'department_id' => $department->id,
+            'role' => UserRole::DEPT_MANAGER->value,
+            'is_active' => true,
+        ])->saveQuietly();
     }
 }
