@@ -4,6 +4,102 @@
 
 @push('styles')
     <style>
+        @keyframes fluid-blob-1 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        @keyframes fluid-blob-2 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(-30px, 40px) scale(1.15);
+            }
+
+            66% {
+                transform: translate(20px, -20px) scale(0.85);
+            }
+        }
+
+        @keyframes element-fade-up {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-fade-up {
+            opacity: 0;
+            animation: element-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        .delay-400 {
+            animation-delay: 400ms;
+        }
+
+        .delay-500 {
+            animation-delay: 500ms;
+        }
+
+        .landing-tilt-wrapper {
+            perspective: 1400px;
+            transform-style: preserve-3d;
+        }
+
+        .landing-tilt-target {
+            transform-style: preserve-3d;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .landing-tilt-target {
+                transform: none !important;
+                transition: none !important;
+            }
+
+            .animate-fade-up {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .fluid-blob {
+                animation: none !important;
+            }
+        }
+
         .landing-shell {
             width: min(100%, 65rem);
             max-width: none;
@@ -335,31 +431,48 @@
 @endpush
 
 @section('content')
-    <section class="landing-shell landing-viewport page-shell flex items-center py-0">
+    <section class="landing-shell landing-viewport page-shell flex items-center py-0 landing-tilt-wrapper"
+        data-tilt-wrapper>
         <div class="w-full">
-            <div class="landing-stage page-card apple-glass-heavy relative overflow-hidden rounded-[1.95rem] px-4 py-4 md:px-5 md:py-5 lg:px-6 lg:py-6">
-                <div class="absolute inset-0 bg-[radial-gradient(circle_at_left_center,rgba(106,226,231,0.14),transparent_34%),radial-gradient(circle_at_right_center,rgba(106,226,231,0.12),transparent_30%),linear-gradient(90deg,rgba(255,255,255,0.28),transparent_18%,transparent_82%,rgba(255,255,255,0.28))]"></div>
+            <div class="landing-stage page-card apple-glass-heavy relative overflow-hidden rounded-[1.95rem] px-4 py-4 md:px-5 md:py-5 lg:px-6 lg:py-6 landing-tilt-target"
+                data-tilt-target>
+
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div
+                        class="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.28),transparent_18%,transparent_82%,rgba(255,255,255,0.28))]">
+                    </div>
+                    <div class="fluid-blob absolute -left-[10%] top-[10%] w-[50%] h-[70%] rounded-full opacity-60 bg-[radial-gradient(circle_at_center,rgba(106,226,231,0.28),transparent_65%)]"
+                        style="animation: fluid-blob-1 14s infinite ease-in-out alternate"></div>
+                    <div class="fluid-blob absolute -right-[5%] bottom-[5%] w-[55%] h-[80%] rounded-full opacity-60 bg-[radial-gradient(circle_at_center,rgba(106,226,231,0.24),transparent_60%)]"
+                        style="animation: fluid-blob-2 16s infinite ease-in-out alternate-reverse"></div>
+                </div>
 
                 <div class="landing-grid relative z-10 h-full">
                     <div class="landing-copy flex flex-col">
                         <div class="landing-copy-main">
-                            <div class="surface-chip landing-eyebrow-pill inline-flex w-fit items-center rounded-full">
+                            <div
+                                class="surface-chip landing-eyebrow-pill inline-flex w-fit items-center rounded-full animate-fade-up">
                                 Kurumsal Dinamik QR Paneli
                             </div>
 
-                            <h1 class="landing-title sf-display font-extrabold text-brand-ink dark:text-white">
+                            <h1 class="landing-title sf-display font-extrabold text-brand-ink dark:text-white animate-fade-up delay-100"
+                                style="transform: translateZ(20px);">
                                 QR s&uuml;recini h&#305;zl&#305;ca ba&#351;lat&#305;n.
                             </h1>
 
-                            <p class="landing-copy-text text-slate-600 dark:text-slate-300">
-                                Giri&#351; yap&#305;n, ba&#287;lant&#305;n&#305;z&#305; olu&#351;turun ve QR dosyan&#305;z&#305; al&#305;n.
+                            <p class="landing-copy-text text-slate-600 dark:text-slate-300 animate-fade-up delay-200">
+                                Giri&#351; yap&#305;n, ba&#287;lant&#305;n&#305;z&#305; olu&#351;turun ve QR
+                                dosyan&#305;z&#305; al&#305;n.
                             </p>
 
-                            <div class="landing-feature mt-4">
+                            <div class="landing-feature mt-4 animate-fade-up delay-300">
                                 <div class="landing-feature-icon icon-shell flex items-center justify-center">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M9.75 12.25a2.25 2.25 0 114.5 0v.75h.25a.75.75 0 01.75.75v2a.75.75 0 01-.75.75h-5a.75.75 0 01-.75-.75v-2a.75.75 0 01.75-.75h.25v-.75z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"
+                                            d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"
+                                            d="M9.75 12.25a2.25 2.25 0 114.5 0v.75h.25a.75.75 0 01.75.75v2a.75.75 0 01-.75.75h-5a.75.75 0 01-.75-.75v-2a.75.75 0 01.75-.75h.25v-.75z">
+                                        </path>
                                     </svg>
                                 </div>
 
@@ -370,18 +483,22 @@
                             </div>
                         </div>
 
-                        <div class="landing-copy-footer">
+                        <div class="landing-copy-footer animate-fade-up delay-400">
                             <div class="landing-actions">
                                 <a href="{{ route('login') }}" class="brand-button">
                                     <span>Kurumsal Giri&#351;</span>
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                     </svg>
                                 </a>
 
                                 <button type="button" class="ghost-button" data-flow-trigger aria-controls="quick-flow">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                     <span>Ak&#305;&#351;&#305; G&ouml;r</span>
                                 </button>
@@ -389,20 +506,26 @@
 
                             <div class="landing-chip-row mt-3">
                                 <div class="surface-chip landing-chip inline-flex items-center gap-2 rounded-full">
-                                    <svg class="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    <svg class="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
                                     </svg>
                                     <span>Kurumsal eri&#351;im</span>
                                 </div>
                                 <div class="surface-chip landing-chip inline-flex items-center gap-2 rounded-full">
-                                    <svg class="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <svg class="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                     <span>Kolay kullan&#305;m</span>
                                 </div>
                                 <div class="surface-chip landing-chip inline-flex items-center gap-2 rounded-full">
-                                    <svg class="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h7"></path>
+                                    <svg class="h-4 w-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 7h16M4 12h10M4 17h7"></path>
                                     </svg>
                                     <span>Tek panel</span>
                                 </div>
@@ -410,12 +533,17 @@
                         </div>
                     </div>
 
-                    <div id="quick-flow" class="landing-guide relative">
-                        <div class="landing-flow page-card apple-glass relative overflow-hidden rounded-[1.5rem]" data-flow-panel tabindex="-1">
+                    <div id="quick-flow" class="landing-guide relative animate-fade-up delay-500"
+                        style="transform: translateZ(40px);">
+                        <div class="landing-flow page-card apple-glass relative overflow-hidden rounded-[1.5rem] landing-tilt-target"
+                            data-flow-panel tabindex="-1" data-tilt-target-inner style="transform: translateZ(20px);">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <h2 class="text-[1.05rem] font-bold tracking-[-0.035em] text-brand-ink dark:text-white">Nas&#305;l ilerlenir?</h2>
-                                    <p class="mt-1 text-[0.72rem] uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">H&#305;zl&#305; rehber</p>
+                                    <h2 class="text-[1.05rem] font-bold tracking-[-0.035em] text-brand-ink dark:text-white">
+                                        Nas&#305;l ilerlenir?</h2>
+                                    <p
+                                        class="mt-1 text-[0.72rem] uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                                        H&#305;zl&#305; rehber</p>
                                 </div>
                                 <div class="status-pill px-3 py-1.5">3 ad&#305;m</div>
                             </div>
@@ -424,20 +552,24 @@
                                 <div class="landing-step-card">
                                     <div class="landing-step-icon">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 12.5l1.5 1.5L14.5 11"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10 12.5l1.5 1.5L14.5 11"></path>
                                         </svg>
                                     </div>
                                     <div class="landing-step-copy">
                                         <p class="landing-step-title">Giri&#351; yap&#305;n</p>
-                                        <p class="landing-step-text">Kurumsal hesab&#305;n&#305;zla giri&#351; yap&#305;n.</p>
+                                        <p class="landing-step-text">Kurumsal hesab&#305;n&#305;zla giri&#351; yap&#305;n.
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div class="landing-step-card">
                                     <div class="landing-step-icon">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4v16m8-8H4"></path>
                                         </svg>
                                     </div>
                                     <div class="landing-step-copy">
@@ -449,7 +581,8 @@
                                 <div class="landing-step-card">
                                     <div class="landing-step-icon">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0l4-4m-4 4l-4-4M5 19h14"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 3v12m0 0l4-4m-4 4l-4-4M5 19h14"></path>
                                         </svg>
                                     </div>
                                     <div class="landing-step-copy">
@@ -492,6 +625,46 @@
                     }, 2600);
                 });
             });
+
+            // 3D Tilt Logic
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const tiltWrapper = document.querySelector('[data-tilt-wrapper]');
+            const tiltTarget = document.querySelector('[data-tilt-target]');
+            const tiltInner = document.querySelector('[data-tilt-target-inner]');
+
+            if (tiltWrapper && tiltTarget) {
+                let rafId;
+
+                tiltWrapper.addEventListener('mousemove', (e) => {
+                    if (rafId) cancelAnimationFrame(rafId);
+
+                    rafId = requestAnimationFrame(() => {
+                        const rect = tiltWrapper.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+
+                        const calcX = ((y - centerY) / centerY) * -1.8; // Max 1.8deg rotation
+                        const calcY = ((x - centerX) / centerX) * 1.8;
+
+                        tiltTarget.style.transform = `rotateX(${calcX}deg) rotateY(${calcY}deg)`;
+                        if (tiltInner) {
+                            tiltInner.style.transform = `translateZ(20px) rotateX(${calcX * -0.5}deg) rotateY(${calcY * -0.5}deg)`;
+                        }
+                    });
+                });
+
+                tiltWrapper.addEventListener('mouseleave', () => {
+                    if (rafId) cancelAnimationFrame(rafId);
+                    tiltTarget.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                    if (tiltInner) {
+                        tiltInner.style.transform = 'translateZ(20px) rotateX(0deg) rotateY(0deg)';
+                    }
+                });
+            }
         });
     </script>
 @endpush

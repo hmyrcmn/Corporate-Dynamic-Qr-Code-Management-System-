@@ -62,6 +62,7 @@
             gap: 1.25rem;
             grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
             margin-bottom: 1.75rem;
+            perspective: 1400px;
         }
 
         .dashboard-metric {
@@ -89,9 +90,10 @@
         }
 
         .dashboard-metric:hover {
-            transform: translateY(-4px) scale(1.01);
-            border-color: rgba(18, 188, 200, 0.35);
-            box-shadow: 0 24px 54px rgba(18, 188, 200, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transform: translateY(-6px) scale(1.02) rotateX(4deg) rotateY(-2deg);
+            border-color: rgba(18, 188, 200, 0.45);
+            box-shadow: -8px 24px 64px rgba(18, 188, 200, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+            z-index: 10;
         }
 
         html.dark .dashboard-metric:hover {
@@ -133,7 +135,7 @@
         .dashboard-metric:hover .dashboard-metric-icon {
             transform: scale(1.08) rotate(-4deg);
         }
-        
+
         .dashboard-metric-value {
             font-size: 2.2rem;
             font-weight: 800;
@@ -256,18 +258,19 @@
         .dashboard-table-head span {
             display: block;
         }
-        
+
         .dashboard-list-scroll {
             min-height: 0;
             flex: 1 1 auto;
             overflow: auto;
             padding-right: 0.5rem;
+            perspective: 1200px;
         }
-        
+
         .dashboard-row {
             padding: 1.15rem 1.25rem;
             border-radius: 1.25rem;
-            transition: all 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: all 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
             background: transparent;
             align-items: center;
             border: 1px solid transparent;
@@ -278,8 +281,8 @@
         .dashboard-row:hover {
             background: rgba(255, 255, 255, 0.6);
             border-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 12px 32px rgba(18, 188, 200, 0.05);
-            transform: scale(1.008);
+            box-shadow: 0 14px 42px rgba(18, 188, 200, 0.12);
+            transform: translateY(-2px) scale(1.01) translateZ(10px);
             z-index: 2;
         }
 
@@ -433,11 +436,13 @@
         <div class="dashboard-top">
             <div class="dashboard-title-area">
                 <span class="eyebrow">Kontrol paneli</span>
-                <h2 class="sf-display mt-2 text-[1.8rem] font-extrabold tracking-[-0.06em] text-brand-ink dark:text-white md:text-[2.2rem]">
+                <h2
+                    class="sf-display mt-2 text-[1.8rem] font-extrabold tracking-[-0.06em] text-brand-ink dark:text-white md:text-[2.2rem]">
                     QR Yönetimi
                 </h2>
                 <p class="mt-1.5 text-[0.82rem] leading-6 text-slate-600 dark:text-slate-300">
-                    <span class="dashboard-department font-semibold">{{ $departmentName }}</span> için bağlantıları yönetin ve listeyi hızla daraltın.
+                    <span class="dashboard-department font-semibold">{{ $departmentName }}</span> için bağlantıları yönetin
+                    ve listeyi hızla daraltın.
                 </p>
             </div>
 
@@ -459,15 +464,20 @@
         </div>
 
         <div class="dashboard-metrics">
-            <a href="{{ $activeFilterUrl }}#qr-list" class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $activeFilterSelected ? 'is-active' : '' }}" aria-label="Aktif bağlantıları filtrele">
+            <a href="{{ $activeFilterUrl }}#qr-list"
+                class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $activeFilterSelected ? 'is-active' : '' }}"
+                aria-label="Aktif bağlantıları filtrele">
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Aktif bağlantılar</p>
+                        <p
+                            class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                            Aktif bağlantılar</p>
                         <div class="dashboard-metric-value">{{ $activeQrCount }}</div>
                     </div>
                     <div class="dashboard-metric-icon">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h7"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7h16M4 12h10M4 17h7"></path>
                         </svg>
                     </div>
                 </div>
@@ -475,13 +485,17 @@
                 <p class="dashboard-metric-copy">
                     Yayındaki kayıtları ayırır.
                 </p>
-               
+
             </a>
 
-            <a href="{{ $scannedFilterUrl }}#qr-list" class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $scannedFilterSelected ? 'is-active' : '' }}" aria-label="Taranan kayıtları filtrele">
+            <a href="{{ $scannedFilterUrl }}#qr-list"
+                class="dashboard-metric rounded-[1.16rem] p-3 md:p-3.5 {{ $scannedFilterSelected ? 'is-active' : '' }}"
+                aria-label="Taranan kayıtları filtrele">
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Toplam tarama</p>
+                        <p
+                            class="text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                            Toplam tarama</p>
                         <div class="dashboard-metric-value">{{ $totalScans }}</div>
                     </div>
                     <div class="dashboard-metric-icon">
@@ -494,23 +508,26 @@
                 <p class="dashboard-metric-copy">
                     Taranan kayıtları öne alır.
                 </p>
-                
+
             </a>
         </div>
 
         <div id="qr-list" class="dashboard-list-card apple-glass-panel page-card rounded-[1.35rem]">
             <div class="dashboard-list-hero">
                 <div>
-                    <span class="surface-chip inline-flex text-cyan-600 bg-cyan-500/10 dark:text-cyan-400 items-center rounded-full px-3.5 py-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300">
+                    <span
+                        class="surface-chip inline-flex text-cyan-600 bg-cyan-500/10 dark:text-cyan-400 items-center rounded-full px-3.5 py-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300">
                         {{ $filterTitle }}
                     </span>
-                    <h3 class="mt-2 text-[1.18rem] font-bold tracking-[-0.05em] text-brand-ink dark:text-white">Kayıtlı Bağlantılar</h3>
+                    <h3 class="mt-2 text-[1.18rem] font-bold tracking-[-0.05em] text-brand-ink dark:text-white">Kayıtlı
+                        Bağlantılar</h3>
                     <p class="dashboard-head-copy">{{ $filterDescription }}</p>
                 </div>
             </div>
 
             <div class="dashboard-list-scroll mt-3">
-                <div class="dashboard-table-head text-[0.78rem] font-extrabold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+                <div
+                    class="dashboard-table-head text-[0.78rem] font-extrabold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
                     <span>Bağlantı</span>
                     <span>Kod</span>
                     <span>Hedef URL</span>
@@ -535,7 +552,8 @@
                             </div>
 
                             <div class="min-w-0">
-                                <div class="break-all text-[0.86rem] leading-6 text-slate-600 dark:text-slate-300 lg:truncate" title="{{ $qrCode->destination_url }}">
+                                <div class="break-all text-[0.86rem] leading-6 text-slate-600 dark:text-slate-300 lg:truncate"
+                                    title="{{ $qrCode->destination_url }}">
                                     {{ $qrCode->destination_url }}
                                 </div>
                             </div>
@@ -545,25 +563,45 @@
                             </div>
 
                             <div class="dashboard-action-grid">
-                                <button type="button" onclick="openQRModal('{{ $qrCode->short_id }}', @js($qrCode->title))" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Görüntüle">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                <button type="button" onclick="openQRModal('{{ $qrCode->short_id }}', @js($qrCode->title))"
+                                    class="dashboard-action-btn inline-flex  items-center justify-center rounded-full"
+                                    title="Görüntüle">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                        </path>
                                     </svg>
                                 </button>
-                                <a href="{{ $globalDepartmentMode ? route('qr.department.download', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.download', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="İndir">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                <a href="{{ $globalDepartmentMode ? route('qr.department.download', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.download', $qrCode->short_id) }}"
+                                    class="dashboard-action-btn inline-flex  items-center justify-center rounded-full"
+                                    title="İndir">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                     </svg>
                                 </a>
-                                <a href="{{ $globalDepartmentMode ? route('qr.department.edit', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.edit', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Düzenle">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                <a href="{{ $globalDepartmentMode ? route('qr.department.edit', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.edit', $qrCode->short_id) }}"
+                                    class="dashboard-action-btn inline-flex  items-center justify-center rounded-full"
+                                    title="Düzenle">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                        </path>
                                     </svg>
                                 </a>
-                                <a href="{{ $globalDepartmentMode ? route('qr.department.delete.confirm', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.delete.confirm', $qrCode->short_id) }}" class="dashboard-action-btn inline-flex  items-center justify-center rounded-full" title="Sil">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                <a href="{{ $globalDepartmentMode ? route('qr.department.delete.confirm', ['department' => $selectedDepartment, 'shortId' => $qrCode->short_id]) : route('qr.delete.confirm', $qrCode->short_id) }}"
+                                    class="dashboard-action-btn inline-flex  items-center justify-center rounded-full"
+                                    title="Sil">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                        </path>
                                     </svg>
                                 </a>
                             </div>
@@ -571,48 +609,61 @@
                     @empty
                         <div class="empty-state-shell rounded-[1.6rem] px-6 py-[4rem] text-center">
                             <div class="mx-auto flex max-w-md flex-col items-center gap-4">
-                                <div class="surface-panel flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full text-slate-400 dark:text-slate-500">
-                                    <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                <div
+                                    class="surface-panel flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full text-slate-400 dark:text-slate-500">
+                                    <svg class="h-9 w-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                                        </path>
                                     </svg>
                                 </div>
                                 <div>
                                     <p class="text-lg font-semibold text-brand-ink dark:text-white">Henüz kayıt bulunmuyor</p>
-                                    <p class="mt-2 text-[0.92rem] leading-7 text-slate-600 dark:text-slate-300">İlk bağlantınızı oluşturarak başlayın.</p>
+                                    <p class="mt-2 text-[0.92rem] leading-7 text-slate-600 dark:text-slate-300">İlk bağlantınızı
+                                        oluşturarak başlayın.</p>
                                 </div>
                             </div>
                         </div>
                     @endforelse
                 </div>
-                
+
                 @if($qrCodes->hasPages())
-                <div class="mt-6 flex justify-center pb-2">
-                    {{ $qrCodes->links() }}
-                </div>
+                    <div class="mt-6 flex justify-center pb-2">
+                        {{ $qrCodes->links() }}
+                    </div>
                 @endif
             </div>
         </div>
     </section>
 
     <div id="qr-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-        <div id="qr-modal-backdrop" class="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 backdrop-blur-sm transition-opacity" onclick="closeQRModal()"></div>
+        <div id="qr-modal-backdrop"
+            class="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 backdrop-blur-sm transition-opacity"
+            onclick="closeQRModal()"></div>
 
-        <div id="qr-modal-content" class="page-card apple-glass-panel relative z-10 flex w-full max-w-md scale-95 flex-col items-center rounded-[2.5rem] border border-white p-8 text-center opacity-0 shadow-[0_24px_80px_rgba(16,32,42,0.16)] transition-all duration-300 dark:border-white/10">
-            <button type="button" onclick="closeQRModal()" class="absolute right-4 top-4 rounded-full bg-white/50 p-2 text-slate-500 transition hover:bg-white hover:text-brand-ink dark:bg-white/8 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white">
+        <div id="qr-modal-content"
+            class="page-card apple-glass-panel relative z-10 flex w-full max-w-md scale-95 flex-col items-center rounded-[2.5rem] border border-white p-8 text-center opacity-0 shadow-[0_24px_80px_rgba(16,32,42,0.16)] transition-all duration-300 dark:border-white/10">
+            <button type="button" onclick="closeQRModal()"
+                class="absolute right-4 top-4 rounded-full bg-white/50 p-2 text-slate-500 transition hover:bg-white hover:text-brand-ink dark:bg-white/8 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
 
-            <h3 id="qr-modal-title" class="mb-6 line-clamp-2 text-xl font-bold leading-tight text-brand-ink dark:text-white">Yükleniyor...</h3>
-            <p class="-mt-3 mb-5 text-[0.72rem] font-extrabold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+            <h3 id="qr-modal-title"
+                class="mb-6 line-clamp-2 text-xl font-bold leading-tight text-brand-ink dark:text-white">Yükleniyor...</h3>
+            <p
+                class="-mt-3 mb-5 text-[0.72rem] font-extrabold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                 Yunus Emre Enstitüsü kurumsal QR kartı
             </p>
 
-            <div class="relative mb-6 flex aspect-[5/6] w-full items-center justify-center rounded-[1.9rem] border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(239,248,249,0.9))] p-4 shadow-inner dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(18,188,200,0.08))]">
+            <div
+                class="relative mb-6 flex aspect-[5/6] w-full items-center justify-center rounded-[1.9rem] border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(239,248,249,0.9))] p-4 shadow-inner dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(18,188,200,0.08))]">
                 <div id="qr-modal-loader" class="absolute inset-0 flex items-center justify-center">
                     <span class="relative flex h-3 w-3">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-500 opacity-75"></span>
+                        <span
+                            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-500 opacity-75"></span>
                         <span class="relative inline-flex h-3 w-3 rounded-full bg-cyan-500"></span>
                     </span>
                 </div>
@@ -622,7 +673,8 @@
             <div class="flex w-full flex-col gap-3">
                 <a id="qr-modal-download" href="#" class="brand-button px-6 py-3.5 text-sm">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
                     <span>Kurumsal QR İndir</span>
                 </a>
