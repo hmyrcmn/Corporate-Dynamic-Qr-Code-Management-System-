@@ -330,52 +330,64 @@ class QrCodeController extends Controller
             writer: new SvgWriter(),
             data: route('qr.redirect', $qrCode->short_id),
             errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: 420,
+            size: 440,
             margin: 18,
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            foregroundColor: new Color(16, 32, 42),
-            backgroundColor: new Color(255, 255, 255),
+            foregroundColor: new Color(13, 35, 46),
+            backgroundColor: new Color(255, 255, 255, 0),
         ))->build();
 
         $qrSize = $qrResult->getMatrix()->getOuterSize();
         $qrContent = $this->extractSvgContents($qrResult->getString());
 
-        $canvasWidth = 760;
-        $canvasHeight = 940;
-        $qrPanelSize = 500;
-        $qrPanelX = 130;
-        $qrPanelY = 156;
+        $canvasWidth = 720;
+        $canvasHeight = 1040;
+        $centerX = $canvasWidth / 2;
+
+        $brandLogoWidth = 260;
+        $brandLogoHeight = 78;
+        $brandLogoX = ($canvasWidth - $brandLogoWidth) / 2;
+        $brandLogoY = 80;
+
+        $qrPanelSize = 520;
+        $qrPanelX = ($canvasWidth - $qrPanelSize) / 2;
+        $qrPanelY = $brandLogoY + $brandLogoHeight + 50;
+
         $qrTranslateX = $qrPanelX + (($qrPanelSize - $qrSize) / 2);
         $qrTranslateY = $qrPanelY + (($qrPanelSize - $qrSize) / 2);
-        $logoBadgeSize = 78;
+
+        $logoBadgeSize = 90;
         $logoBadgeX = ($canvasWidth - $logoBadgeSize) / 2;
         $logoBadgeY = $qrPanelY + (($qrPanelSize - $logoBadgeSize) / 2);
-        $logoSize = 36;
+        $logoSize = 48;
         $logoX = ($canvasWidth - $logoSize) / 2;
         $logoY = $logoBadgeY + (($logoBadgeSize - $logoSize) / 2);
-        $brandLogoWidth = 214;
-        $brandLogoHeight = 64;
-        $brandLogoX = ($canvasWidth - $brandLogoWidth) / 2;
-        $brandLogoY = 72;
 
         $brandLogoDataUri = $this->imageDataUri(public_path('img/yee-logo.png'));
         $faviconDataUri = $this->imageDataUri(public_path('img/yee-favicon.png'));
 
         $rawDepartmentName = trim((string) ($qrCode->department?->name ?? 'Kurumsal Birim'));
-        $departmentLines = $this->svgWrappedLines($rawDepartmentName, 24, 4);
+        $rawDepartmentName = mb_strtoupper(str_replace(['i', 'ı'], ['İ', 'I'], $rawDepartmentName), 'UTF-8');
+
+        $departmentLines = $this->svgWrappedLines($rawDepartmentName, 32, 2);
         $departmentLineCount = max(count($departmentLines), 1);
         $departmentFontSize = match (true) {
-            $departmentLineCount >= 4 => 17,
-            $departmentLineCount === 3 => 19,
-            $departmentLineCount === 2 => 21,
-            default => 24,
+            $departmentLineCount >= 2 => 26,
+            default => 30,
         };
-        $departmentLineHeight = $departmentFontSize + 4;
-        $departmentFirstY = 754;
-        $departmentTspans = $this->svgTspans($departmentLines, 380, $departmentFirstY, $departmentLineHeight);
-        $titleLines = $this->svgWrappedLines((string) $qrCode->title, 30, 3);
-        $titleFirstY = $departmentFirstY + (($departmentLineCount - 1) * $departmentLineHeight) + 28;
-        $titleTspans = $this->svgTspans($titleLines, 380, $titleFirstY, 18);
+        $departmentLineHeight = $departmentFontSize + 14;
+
+        $textStartY = $qrPanelY + $qrPanelSize + 85;
+        $departmentFirstY = $textStartY + $departmentFontSize;
+        $departmentTspans = $this->svgTspans($departmentLines, $centerX, $departmentFirstY, $departmentLineHeight);
+
+        $titleLines = $this->svgWrappedLines((string) $qrCode->title, 45, 2);
+        $titleStartY = $departmentFirstY + (($departmentLineCount - 1) * $departmentLineHeight) + 40;
+        $titleTspans = $this->svgTspans($titleLines, $centerX, $titleStartY, 28);
+
+        $brandTextY = $brandLogoY + 45;
+        $canvasInnerWidth = $canvasWidth - 2;
+        $canvasInnerHeight = $canvasHeight - 2;
 
         return <<<SVG
 <?xml version="1.0" encoding="UTF-8"?>
@@ -383,70 +395,42 @@ class QrCodeController extends Controller
     <title id="qr-title">Yunus Emre Enstitüsü Kurumsal QR</title>
     <desc id="qr-subtitle">{$this->svgText($rawDepartmentName)} için markalı kurumsal QR kartı</desc>
     <defs>
-        <linearGradient id="surfaceGradient" x1="48" y1="24" x2="712" y2="916" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#F6F9F9"/>
-            <stop offset="1" stop-color="#EDF3F4"/>
+        <linearGradient id="glassCard" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#F2F8F9" stop-opacity="1"/>
         </linearGradient>
-        <linearGradient id="cardGradient" x1="68" y1="34" x2="692" y2="906" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#FFFFFF"/>
-            <stop offset="1" stop-color="#F9FCFC"/>
+        <linearGradient id="glassStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#DEEBEF" stop-opacity="0.3"/>
         </linearGradient>
-        <linearGradient id="cardStroke" x1="68" y1="32" x2="692" y2="906" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#EAF1F2"/>
-            <stop offset="1" stop-color="#DFEAEC"/>
-        </linearGradient>
-        <linearGradient id="infoGradient" x1="112" y1="690" x2="648" y2="858" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#FAFCFC"/>
-            <stop offset="1" stop-color="#F4F8F9"/>
-        </linearGradient>
-        <linearGradient id="badgeGradient" x1="320" y1="372" x2="408" y2="460" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#FFFFFF"/>
-            <stop offset="1" stop-color="#F5F9FA"/>
-        </linearGradient>
-        <filter id="cardShadow" x="20" y="12" width="720" height="916" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-            <feOffset dy="18"/>
-            <feGaussianBlur stdDeviation="22"/>
-            <feComposite in2="hardAlpha" operator="out"/>
-            <feColorMatrix type="matrix" values="0 0 0 0 0.0509804 0 0 0 0 0.105882 0 0 0 0 0.129412 0 0 0 0.11 0"/>
-            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_1"/>
-            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
+
+        <filter id="qrShadow" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="15" result="blur"/>
+            <feOffset dy="8" result="offsetBlur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.04"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
         </filter>
-        <filter id="panelShadow" x="118" y="144" width="524" height="524" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-            <feOffset dy="8"/>
-            <feGaussianBlur stdDeviation="10"/>
-            <feComposite in2="hardAlpha" operator="out"/>
-            <feColorMatrix type="matrix" values="0 0 0 0 0.0705882 0 0 0 0 0.239216 0 0 0 0 0.27451 0 0 0 0.05 0"/>
-            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_2"/>
-            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_2" result="shape"/>
-        </filter>
-        <filter id="badgeShadow" x="300" y="362" width="122" height="122" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-            <feOffset dy="6"/>
-            <feGaussianBlur stdDeviation="7"/>
-            <feComposite in2="hardAlpha" operator="out"/>
-            <feColorMatrix type="matrix" values="0 0 0 0 0.0705882 0 0 0 0 0.239216 0 0 0 0 0.27451 0 0 0 0.12 0"/>
-            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_3"/>
-            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_3" result="shape"/>
+        
+        <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.10"/>
         </filter>
     </defs>
-    <rect width="{$canvasWidth}" height="{$canvasHeight}" fill="url(#surfaceGradient)"/>
-    <g filter="url(#cardShadow)">
-        <rect x="44" y="28" width="672" height="884" rx="48" fill="url(#cardGradient)"/>
-        <rect x="44.75" y="28.75" width="670.5" height="882.5" rx="47.25" stroke="url(#cardStroke)" stroke-width="1"/>
-    </g>
+
+    <rect width="{$canvasWidth}" height="{$canvasHeight}" rx="48" fill="url(#glassCard)"/>
+    <rect x="1" y="1" width="{$canvasInnerWidth}" height="{$canvasInnerHeight}" rx="47" fill="none" stroke="url(#glassStroke)" stroke-width="2"/>
 SVG
             . ($brandLogoDataUri !== ''
                 ? "\n    <image href=\"{$brandLogoDataUri}\" x=\"{$brandLogoX}\" y=\"{$brandLogoY}\" width=\"{$brandLogoWidth}\" height=\"{$brandLogoHeight}\" preserveAspectRatio=\"xMidYMid meet\"/>"
-                : "\n    <text x=\"380\" y=\"112\" text-anchor=\"middle\" font-family=\"Inter, Arial, sans-serif\" font-size=\"28\" font-weight=\"700\" fill=\"#10202A\">Yunus Emre Enstitüsü</text>")
+                : "\n    <text x=\"{$centerX}\" y=\"{$brandTextY}\" text-anchor=\"middle\" font-family=\"-apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif\" font-size=\"32\" font-weight=\"800\" letter-spacing=\"-0.5\" fill=\"#10202A\">Yunus Emre Enstitüsü</text>")
             . <<<SVG
 
-    <g filter="url(#panelShadow)">
-        <rect x="{$qrPanelX}" y="{$qrPanelY}" width="{$qrPanelSize}" height="{$qrPanelSize}" rx="38" fill="#FFFFFF"/>
+    <g filter="url(#qrShadow)">
+        <rect x="{$qrPanelX}" y="{$qrPanelY}" width="{$qrPanelSize}" height="{$qrPanelSize}" rx="32" fill="#FFFFFF"/>
     </g>
     <g transform="translate({$qrTranslateX} {$qrTranslateY})">
         {$qrContent}
@@ -456,18 +440,16 @@ SVG
                 ? <<<SVG
 
     <g filter="url(#badgeShadow)">
-        <rect x="{$logoBadgeX}" y="{$logoBadgeY}" width="{$logoBadgeSize}" height="{$logoBadgeSize}" rx="24" fill="url(#badgeGradient)"/>
+        <rect x="{$logoBadgeX}" y="{$logoBadgeY}" width="{$logoBadgeSize}" height="{$logoBadgeSize}" rx="24" fill="#FFFFFF"/>
         <image href="{$faviconDataUri}" x="{$logoX}" y="{$logoY}" width="{$logoSize}" height="{$logoSize}" preserveAspectRatio="xMidYMid meet"/>
     </g>
 SVG
                 : '')
             . <<<SVG
 
-    <g>
-        <rect x="112" y="690" width="536" height="166" rx="30" fill="url(#infoGradient)"/>
-        <text x="380" text-anchor="middle" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="{$departmentFontSize}" font-weight="700" fill="#10202A">{$departmentTspans}</text>
-        <text x="380" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600" fill="#5A747A">{$titleTspans}</text>
-    </g>
+    <text x="{$centerX}" text-anchor="middle" font-family="-apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="{$departmentFontSize}" font-weight="700" letter-spacing="1.5" fill="#1D1D1F">{$departmentTspans}</text>
+    
+    <text x="{$centerX}" text-anchor="middle" font-family="-apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="500" letter-spacing="0.2" fill="#86868B">{$titleTspans}</text>
 </svg>
 SVG;
     }
