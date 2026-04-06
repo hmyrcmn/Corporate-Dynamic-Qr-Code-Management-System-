@@ -15,7 +15,7 @@
             grid-template-columns: 1fr;
         }
 
-        @media (min-width: 56rem) {
+        @media (min-width: 64rem) {
             .department-hub-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -25,9 +25,9 @@
             position: relative;
             overflow: hidden;
             display: flex;
-            min-height: 19.5rem;
+            min-height: 17.75rem;
             flex-direction: column;
-            gap: 0.95rem;
+            gap: 0.85rem;
             border-radius: 2rem;
             padding: 1.3rem;
             text-decoration: none;
@@ -61,35 +61,17 @@
             box-shadow: 0 30px 64px rgba(0, 0, 0, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
-        .department-hub-badge {
-            display: inline-flex;
-            align-items: center;
-            width: fit-content;
-            border-radius: 999px;
-            padding: 0.55rem 0.9rem;
-            background: rgba(18, 188, 200, 0.1);
-            color: #0f8d97;
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-        }
-
-        html.dark .department-hub-badge {
-            background: rgba(18, 188, 200, 0.18);
-            color: #8be8ec;
-        }
-
         .department-hub-card-header {
             display: grid;
-            gap: 0.65rem;
+            gap: 0.55rem;
+            min-width: 0;
         }
 
         .department-hub-card-top {
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
             align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.85rem;
+            gap: 0.75rem;
         }
 
         .department-hub-card-title {
@@ -98,6 +80,7 @@
             letter-spacing: -0.04em;
             line-height: 1.18;
             color: var(--brand-ink);
+            overflow-wrap: anywhere;
         }
 
         html.dark .department-hub-card-title {
@@ -277,11 +260,10 @@
         }
 
         .department-hub-open {
-            margin-top: auto;
+            margin-top: 0.15rem;
             display: inline-flex;
             align-items: center;
             gap: 0.45rem;
-            padding-top: 0.2rem;
             font-size: 0.8rem;
             font-weight: 800;
             letter-spacing: 0.18em;
@@ -289,11 +271,19 @@
             color: #0f8d97;
         }
 
+        .department-hub-open svg {
+            flex-shrink: 0;
+        }
+
         html.dark .department-hub-open {
             color: #8be8ec;
         }
 
         @media (max-width: 63.99rem) {
+            .department-hub-card {
+                min-height: auto;
+            }
+
             .department-hub-summary {
                 width: 100%;
                 min-width: 0;
@@ -303,7 +293,6 @@
 
         @media (max-width: 47.99rem) {
             .department-hub-card {
-                min-height: auto;
                 gap: 0.8rem;
                 border-radius: 1.5rem;
                 padding: 1rem;
@@ -314,8 +303,7 @@
             }
 
             .department-hub-card-top {
-                flex-direction: column;
-                align-items: flex-start;
+                grid-template-columns: 1fr;
             }
 
             .department-hub-card-title {
@@ -340,12 +328,30 @@
                 letter-spacing: 0.14em;
             }
         }
+
+        @media (max-width: 31.99rem) {
+            .department-hub-shell {
+                width: 100%;
+            }
+
+            .department-hub-card {
+                padding: 0.9rem;
+            }
+
+            .department-hub-card-copy {
+                font-size: 0.77rem;
+            }
+
+            .department-hub-summary {
+                padding: 0.9rem 1rem;
+            }
+        }
     </style>
 @endpush
 
 @section('content')
     <section class="department-hub-shell page-shell flex flex-col gap-5 pb-4">
-        <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-3xl">
                 <span class="eyebrow">Kontrol paneli</span>
                 <h2
@@ -369,8 +375,6 @@
         <div class="department-hub-grid">
             @forelse ($departments as $department)
                 <a href="{{ route('dashboard.department', $department) }}" class="department-hub-card">
-                    <span class="department-hub-badge">Birim Kartı</span>
-
                     <div class="department-hub-card-header">
                         <div class="department-hub-card-top">
                             <h3 class="department-hub-card-title">{{ $department->name }}</h3>
