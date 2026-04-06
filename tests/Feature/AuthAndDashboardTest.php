@@ -232,16 +232,15 @@ class AuthAndDashboardTest extends TestCase
             ->assertHeader('Content-Disposition', "inline; filename=\"qr-{$qrCode->short_id}.svg\"")
             ->assertSee('<svg', false)
             ->assertSee('Yunus Emre Enstitüsü Kurumsal QR', false)
-            ->assertSee('BİRİM', false)
             ->assertDontSee('Dijital yönlendirme', false)
             ->assertDontSee('RESMİ ERİŞİM KARTI', false)
             ->assertDontSee('KURUMSAL QR', false)
             ->assertDontSee(strtoupper($qrCode->short_id), false)
-            ->assertSee('<tspan x="380" y="754">Kultur ve Uluslararasi</tspan>', false)
-            ->assertSee('<tspan x="380" y="779">Programlar Birimi</tspan>', false)
+            ->assertSee('<tspan x="360" y="839">KULTUR VE ULUSLARARASİ</tspan>', false)
+            ->assertSee('<tspan x="360" y="879">PROGRAMLAR BİRİMİ</tspan>', false)
             ->assertSee('Uluslararasi kultur programi', false)
-            ->assertSee('yonlendirme kaydi', false)
-            ->assertSee('<tspan x="380" y="807">Uluslararasi kultur programi</tspan>', false)
+            ->assertSee('<tspan x="360" y="919">Uluslararasi kultur programi yonlendirme</tspan>', false)
+            ->assertSee('<tspan x="360" y="947">kaydi</tspan>', false)
             ->assertSee('data:image/png;base64,', false);
 
         $svg = $response->getContent();

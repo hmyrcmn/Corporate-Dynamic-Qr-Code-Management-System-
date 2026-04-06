@@ -60,9 +60,8 @@
         .dashboard-metrics {
             display: grid;
             gap: 1.25rem;
-            grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
             margin-bottom: 1.75rem;
-            perspective: 1400px;
         }
 
         .dashboard-metric {
@@ -90,9 +89,9 @@
         }
 
         .dashboard-metric:hover {
-            transform: translateY(-6px) scale(1.02) rotateX(4deg) rotateY(-2deg);
+            transform: translateY(-3px);
             border-color: rgba(18, 188, 200, 0.45);
-            box-shadow: -8px 24px 64px rgba(18, 188, 200, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 44px rgba(18, 188, 200, 0.14), inset 0 2px 0 rgba(255, 255, 255, 0.9);
             z-index: 10;
         }
 
@@ -264,7 +263,6 @@
             flex: 1 1 auto;
             overflow: auto;
             padding-right: 0.5rem;
-            perspective: 1200px;
         }
 
         .dashboard-row {
@@ -282,7 +280,7 @@
             background: rgba(255, 255, 255, 0.6);
             border-color: rgba(255, 255, 255, 0.9);
             box-shadow: 0 14px 42px rgba(18, 188, 200, 0.12);
-            transform: translateY(-2px) scale(1.01) translateZ(10px);
+            transform: translateY(-1px);
             z-index: 2;
         }
 
@@ -406,6 +404,227 @@
             justify-content: start;
         }
 
+        .dashboard-row-url-text {
+            word-break: break-word;
+        }
+
+        @media (max-width: 63.99rem) {
+            .dashboard-list-card {
+                padding: 1.1rem;
+            }
+
+            .dashboard-list-hero {
+                padding-bottom: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .dashboard-list-scroll {
+                overflow: visible;
+                padding-right: 0;
+                margin-top: 0.75rem;
+            }
+
+            .dashboard-row {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-areas:
+                    "main main"
+                    "url url"
+                    "code scan"
+                    "actions actions";
+                gap: 0.85rem;
+                padding: 1rem;
+                margin-bottom: 0.65rem;
+                border-color: rgba(255, 255, 255, 0.75);
+                background: rgba(255, 255, 255, 0.4);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+            }
+
+            html.dark .dashboard-row {
+                border-color: rgba(255, 255, 255, 0.07);
+                background: rgba(255, 255, 255, 0.03);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            }
+
+            .dashboard-row-main {
+                grid-area: main;
+            }
+
+            .dashboard-row-code {
+                grid-area: code;
+                align-self: center;
+            }
+
+            .dashboard-row-url {
+                grid-area: url;
+            }
+
+            .dashboard-row-scan {
+                grid-area: scan;
+                justify-self: end;
+                align-self: center;
+            }
+
+            .dashboard-row-actions {
+                grid-area: actions;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                width: 100%;
+            }
+
+            .dashboard-row-title {
+                font-size: 1rem;
+                line-height: 1.35;
+            }
+
+            .dashboard-row-subtitle {
+                margin-top: 0.35rem;
+                gap: 0.35rem;
+                font-size: 0.68rem;
+                letter-spacing: 0.08em;
+            }
+
+            .dashboard-row-url-text {
+                display: -webkit-box;
+                overflow: hidden;
+                border-radius: 1rem;
+                background: rgba(255, 255, 255, 0.55);
+                padding: 0.75rem 0.85rem;
+                line-height: 1.5;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+            }
+
+            html.dark .dashboard-row-url-text {
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+            .dashboard-link-code,
+            .dashboard-scan-pill {
+                min-width: 0;
+            }
+
+            .dashboard-action-btn {
+                width: 100%;
+                height: 2.8rem;
+                border-radius: 0.95rem;
+            }
+        }
+
+        @media (max-width: 47.99rem) {
+            .dashboard-shell {
+                width: 100%;
+                min-height: auto;
+            }
+
+            .dashboard-top {
+                gap: 1rem;
+            }
+
+            .dashboard-title-area {
+                max-width: none;
+            }
+
+            .dashboard-action-rail {
+                display: grid;
+                grid-template-columns: 1fr;
+                width: 100%;
+                gap: 0.65rem;
+            }
+
+            .dashboard-action-rail > * {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .dashboard-metrics {
+                grid-template-columns: 1fr;
+                gap: 0.9rem;
+                margin-bottom: 1.2rem;
+            }
+
+            .dashboard-metric {
+                padding: 1.1rem 1.15rem;
+                gap: 0.8rem;
+            }
+
+            .dashboard-metric:hover,
+            .dashboard-row:hover {
+                transform: none;
+            }
+
+            .dashboard-metric-value {
+                font-size: 1.9rem;
+            }
+
+            .dashboard-head-copy {
+                font-size: 0.84rem;
+                line-height: 1.55;
+            }
+
+            .dashboard-list-card {
+                padding: 0.95rem;
+            }
+
+            .dashboard-row {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "main"
+                    "url"
+                    "code"
+                    "scan"
+                    "actions";
+            }
+
+            .dashboard-row-scan {
+                justify-self: start;
+            }
+
+            .dashboard-action-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .dashboard-table-head {
+                padding: 0 0 0.6rem;
+            }
+        }
+
+        @media (max-width: 31.99rem) {
+            .dashboard-row {
+                gap: 0.7rem;
+                padding: 0.85rem;
+            }
+
+            .dashboard-row-title {
+                font-size: 0.94rem;
+            }
+
+            .dashboard-row-subtitle {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.2rem;
+            }
+
+            .dashboard-row-subtitle span[aria-hidden="true"] {
+                display: none;
+            }
+
+            .dashboard-action-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .dashboard-row-url-text {
+                padding: 0.68rem 0.75rem;
+                font-size: 0.8rem;
+                line-height: 1.45;
+            }
+
+            .dashboard-link-code,
+            .dashboard-scan-pill {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         @media (min-width: 64rem) {
             .dashboard-table-head {
                 display: grid;
@@ -421,6 +640,125 @@
 
             .dashboard-action-grid {
                 justify-content: end;
+            }
+        }
+
+        .qr-modal-shell {
+            padding: clamp(0.75rem, 2vw, 1.25rem);
+            overflow-y: auto;
+        }
+
+        .qr-modal-panel {
+            width: min(100%, 28rem);
+            max-height: calc(100svh - 1.5rem);
+            padding: clamp(1rem, 2vw, 1.75rem);
+            border-radius: 2rem;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .qr-modal-title {
+            margin-bottom: 0.85rem;
+            padding-inline: 2rem;
+            font-size: clamp(1.05rem, 2.3vw, 1.3rem);
+            line-height: 1.3;
+        }
+
+        .qr-modal-copy {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 0.68rem;
+            letter-spacing: 0.22em;
+        }
+
+        .qr-modal-preview {
+            position: relative;
+            margin-bottom: 1rem;
+            display: flex;
+            width: min(100%, 22rem);
+            max-width: 100%;
+            max-height: min(50svh, 31rem);
+            aspect-ratio: 18 / 25;
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+            border-radius: 1.7rem;
+            padding: 0.9rem;
+            overflow: hidden;
+        }
+
+        .qr-modal-image {
+            height: 100%;
+            width: 100%;
+            border-radius: 1.15rem;
+            object-fit: contain;
+        }
+
+        .qr-modal-actions {
+            width: 100%;
+            gap: 0.75rem;
+        }
+
+        .qr-modal-actions-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 47.99rem) {
+            .qr-modal-panel {
+                width: min(100%, 24.5rem);
+                max-height: calc(100svh - 1rem);
+                border-radius: 1.6rem;
+                padding: 0.95rem;
+            }
+
+            .qr-modal-title {
+                margin-bottom: 0.7rem;
+                padding-inline: 1.6rem;
+                font-size: 1rem;
+            }
+
+            .qr-modal-copy {
+                margin-bottom: 0.85rem;
+                font-size: 0.64rem;
+                letter-spacing: 0.18em;
+            }
+
+            .qr-modal-preview {
+                max-height: min(42svh, 23rem);
+                padding: 0.75rem;
+                border-radius: 1.35rem;
+            }
+
+            .qr-modal-actions-row {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+        }
+
+        @media (max-height: 760px) {
+            .qr-modal-panel {
+                max-height: calc(100svh - 0.75rem);
+                padding: 0.9rem;
+            }
+
+            .qr-modal-title {
+                margin-bottom: 0.55rem;
+                font-size: 0.98rem;
+            }
+
+            .qr-modal-copy {
+                margin-bottom: 0.75rem;
+            }
+
+            .qr-modal-preview {
+                max-height: min(36svh, 18.5rem);
+                margin-bottom: 0.85rem;
+            }
+
+            .qr-modal-actions {
+                gap: 0.6rem;
             }
         }
     </style>
@@ -538,7 +876,7 @@
                 <div class="space-y-2">
                     @forelse ($qrCodes as $qrCode)
                         <article class="table-row dashboard-row rounded-[1.05rem] p-2.5 md:p-3">
-                            <div class="min-w-0">
+                            <div class="dashboard-row-main min-w-0">
                                 <p class="dashboard-row-title">{{ $qrCode->title }}</p>
                                 <div class="dashboard-row-subtitle">
                                     <span>{{ $qrCode->department?->name }}</span>
@@ -547,22 +885,22 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center">
+                            <div class="dashboard-row-code flex items-center">
                                 <span class="dashboard-link-code">{{ $qrCode->short_id }}</span>
                             </div>
 
-                            <div class="min-w-0">
-                                <div class="break-all text-[0.86rem] leading-6 text-slate-600 dark:text-slate-300 lg:truncate"
+                            <div class="dashboard-row-url min-w-0">
+                                <div class="dashboard-row-url-text break-all text-[0.86rem] leading-6 text-slate-600 dark:text-slate-300 lg:truncate"
                                     title="{{ $qrCode->destination_url }}">
                                     {{ $qrCode->destination_url }}
                                 </div>
                             </div>
 
-                            <div class="flex items-center">
+                            <div class="dashboard-row-scan flex items-center">
                                 <span class="dashboard-scan-pill">{{ $qrCode->scans_count }}</span>
                             </div>
 
-                            <div class="dashboard-action-grid">
+                            <div class="dashboard-row-actions dashboard-action-grid">
                                 <button type="button" onclick="openQRModal('{{ $qrCode->short_id }}', @js($qrCode->title))"
                                     class="dashboard-action-btn inline-flex  items-center justify-center rounded-full"
                                     title="Görüntüle">
@@ -637,13 +975,13 @@
         </div>
     </section>
 
-    <div id="qr-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div id="qr-modal" class="qr-modal-shell fixed inset-0 z-[100] hidden items-start justify-center sm:items-center">
         <div id="qr-modal-backdrop"
             class="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 backdrop-blur-sm transition-opacity"
             onclick="closeQRModal()"></div>
 
         <div id="qr-modal-content"
-            class="page-card apple-glass-panel relative z-10 flex w-full max-w-md scale-95 flex-col items-center rounded-[2.5rem] border border-white p-8 text-center opacity-0 shadow-[0_24px_80px_rgba(16,32,42,0.16)] transition-all duration-300 dark:border-white/10">
+            class="qr-modal-panel page-card apple-glass-panel relative z-10 my-auto flex w-full scale-95 flex-col items-center border border-white text-center opacity-0 shadow-[0_24px_80px_rgba(16,32,42,0.16)] transition-all duration-300 dark:border-white/10">
             <button type="button" onclick="closeQRModal()"
                 class="absolute right-4 top-4 rounded-full bg-white/50 p-2 text-slate-500 transition hover:bg-white hover:text-brand-ink dark:bg-white/8 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -652,14 +990,14 @@
             </button>
 
             <h3 id="qr-modal-title"
-                class="mb-6 line-clamp-2 text-xl font-bold leading-tight text-brand-ink dark:text-white">Yükleniyor...</h3>
+                class="qr-modal-title line-clamp-2 font-bold text-brand-ink dark:text-white">Yükleniyor...</h3>
             <p
-                class="-mt-3 mb-5 text-[0.72rem] font-extrabold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+                class="qr-modal-copy font-extrabold uppercase text-slate-500 dark:text-slate-400">
                 Yunus Emre Enstitüsü kurumsal QR kartı
             </p>
 
             <div
-                class="relative mb-6 flex aspect-[5/6] w-full items-center justify-center rounded-[1.9rem] border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(239,248,249,0.9))] p-4 shadow-inner dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(18,188,200,0.08))]">
+                class="qr-modal-preview border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(239,248,249,0.9))] shadow-inner dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(18,188,200,0.08))]">
                 <div id="qr-modal-loader" class="absolute inset-0 flex items-center justify-center">
                     <span class="relative flex h-3 w-3">
                         <span
@@ -667,11 +1005,11 @@
                         <span class="relative inline-flex h-3 w-3 rounded-full bg-cyan-500"></span>
                     </span>
                 </div>
-                <img id="qr-modal-img" src="" alt="QR kod" class="hidden h-full w-full rounded-[1.4rem] object-contain">
+                <img id="qr-modal-img" src="" alt="QR kod" class="qr-modal-image hidden">
             </div>
 
-            <div class="flex w-full flex-col gap-3">
-                <div class="grid grid-cols-2 gap-3">
+            <div class="qr-modal-actions flex flex-col">
+                <div class="qr-modal-actions-row">
                     <a id="qr-modal-download" href="#" class="brand-button px-3 py-3 text-[0.8rem]" title="Orijinal format: Vektörel SVG">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -685,7 +1023,7 @@
                         <span>PNG Kaydet</span>
                     </button>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="qr-modal-actions-row">
                     <button type="button" onclick="printQr()" class="ghost-button px-4 py-3 text-[0.8rem]">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>

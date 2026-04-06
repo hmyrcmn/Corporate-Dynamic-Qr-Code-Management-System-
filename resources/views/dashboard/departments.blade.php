@@ -15,7 +15,7 @@
             grid-template-columns: 1fr;
         }
 
-        @media (min-width: 72rem) {
+        @media (min-width: 56rem) {
             .department-hub-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -291,6 +291,54 @@
 
         html.dark .department-hub-open {
             color: #8be8ec;
+        }
+
+        @media (max-width: 63.99rem) {
+            .department-hub-summary {
+                width: 100%;
+                min-width: 0;
+                align-self: stretch;
+            }
+        }
+
+        @media (max-width: 47.99rem) {
+            .department-hub-card {
+                min-height: auto;
+                gap: 0.8rem;
+                border-radius: 1.5rem;
+                padding: 1rem;
+            }
+
+            .department-hub-card:hover {
+                transform: none;
+            }
+
+            .department-hub-card-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .department-hub-card-title {
+                font-size: 1.08rem;
+            }
+
+            .department-hub-card-copy {
+                font-size: 0.8rem;
+                line-height: 1.5;
+            }
+
+            .department-hub-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .department-hub-metric {
+                padding: 0.72rem 0.8rem;
+            }
+
+            .department-hub-open {
+                font-size: 0.74rem;
+                letter-spacing: 0.14em;
+            }
         }
     </style>
 @endpush
