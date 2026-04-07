@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $pageTitle.' | Dinamik QR')
+@section('title', $pageTitle . ' | Dinamik QR')
 
 @push('styles')
     <style>
@@ -235,14 +235,14 @@
             position: relative;
             cursor: pointer;
             outline: none;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: background 300ms ease;
             margin: 0;
         }
 
         html.dark .qr-form-status-toggle {
             background: rgba(255, 255, 255, 0.15);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .qr-form-status-toggle::after {
@@ -254,8 +254,8 @@
             height: 1.5rem;
             background: white;
             border-radius: 50%;
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             transition: transform 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
@@ -285,6 +285,7 @@
             .qr-form-stack {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+
             .qr-form-meta {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -380,6 +381,7 @@
         }
 
         @media (max-width: 63.999rem) {
+
             .qr-form-header,
             .qr-form-body {
                 padding-inline: 1.5rem;
@@ -394,7 +396,7 @@
                 padding-top: 1.25rem;
                 padding-bottom: 1.5rem;
             }
-            
+
             .qr-form-actions {
                 flex-direction: column;
                 align-items: stretch;
@@ -422,19 +424,25 @@
                         <div class="qr-form-icon">
                             @if ($qrCode->exists)
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6.768-6.768a2.5 2.5 0 113.536 3.536L12.536 14.5a4 4 0 01-1.697 1.03L7 16l.47-3.839A4 4 0 018.5 10.464z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.232 5.232l3.536 3.536M9 11l6.768-6.768a2.5 2.5 0 113.536 3.536L12.536 14.5a4 4 0 01-1.697 1.03L7 16l.47-3.839A4 4 0 018.5 10.464z">
+                                    </path>
                                 </svg>
                             @else
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                                    </path>
                                 </svg>
                             @endif
                         </div>
 
                         <div class="min-w-0">
-                            <h1 class="qr-form-title sf-display font-extrabold text-brand-ink dark:text-white">{{ $pageTitle }}</h1>
+                            <h1 class="qr-form-title sf-display font-extrabold text-brand-ink dark:text-white">
+                                {{ $pageTitle }}</h1>
                             <p class="qr-form-copy mt-2.5 text-slate-600 dark:text-slate-300">
-                                Sistem üzerinde yönlendirilecek {{ $qrCode->exists ? 'kaydı güncelleyin' : 'yeni bir bağlantı oluşturun' }}. Hedef URL ve diğer bilgileri eksiksiz doldurun.
+                                Sistem üzerinde yönlendirilecek
+                                {{ $qrCode->exists ? 'kaydı güncelleyin' : 'yeni bir bağlantı oluşturun' }}. Hedef URL ve
+                                diğer bilgileri eksiksiz doldurun.
                             </p>
                         </div>
                     </div>
@@ -442,7 +450,8 @@
 
                 <div class="qr-form-body">
                     @if ($errors->any())
-                        <div class="rounded-[1rem] border border-rose-200 bg-rose-50 px-3 py-2.5 text-[0.78rem] font-semibold text-rose-600 dark:border-rose-400/20 dark:bg-rose-500/10 dark:text-rose-200">
+                        <div
+                            class="rounded-[1rem] border border-rose-200 bg-rose-50 px-3 py-2.5 text-[0.78rem] font-semibold text-rose-600 dark:border-rose-400/20 dark:bg-rose-500/10 dark:text-rose-200">
                             {{ $errors->first() }}
                         </div>
                     @endif
@@ -458,24 +467,22 @@
                             <p class="text-[0.92rem] font-semibold text-brand-ink dark:text-white">
                                 {{ $selectedDepartment?->name ?? 'Atanmamış Birim' }}
                             </p>
-                            <p class="mt-1 text-[0.78rem] leading-6 text-slate-600 dark:text-slate-300">
-                                @if (auth()->user()->hasGlobalDepartmentAccess())
-                                    Bu form sadece seçilen birim için çalışır.
-                                @else
-                                    Bu hesap yalnızca kendi birimi için kayıt yönetebilir.
-                                @endif
-                            </p>
+
                         </div>
 
                         <div class="qr-form-stack">
                             <div>
                                 <label for="title" class="qr-form-field-label">Başlık</label>
-                                <input type="text" id="title" name="title" required maxlength="255" value="{{ old('title', $qrCode->title) }}" class="field-shell qr-form-input" placeholder="Örn: Yaz Kursu Kataloğu">
+                                <input type="text" id="title" name="title" required maxlength="255"
+                                    value="{{ old('title', $qrCode->title) }}" class="field-shell qr-form-input"
+                                    placeholder="Örn: Yaz Kursu Kataloğu">
                             </div>
 
                             <div>
                                 <label for="destination_url" class="qr-form-field-label">Hedef URL</label>
-                                <input type="url" id="destination_url" name="destination_url" required value="{{ old('destination_url', $qrCode->destination_url) }}" class="field-shell qr-form-input" placeholder="https://yee.org.tr/...">
+                                <input type="url" id="destination_url" name="destination_url" required
+                                    value="{{ old('destination_url', $qrCode->destination_url) }}"
+                                    class="field-shell qr-form-input" placeholder="https://yee.org.tr/...">
                             </div>
                         </div>
 
@@ -483,7 +490,8 @@
                             <div class="qr-form-meta">
                                 <div class="surface-panel qr-form-meta-card">
                                     <p class="field-label mb-2">Kısa kod</p>
-                                    <p class="text-[0.84rem] font-semibold text-brand-ink dark:text-white">{{ $qrCode->short_id ?: 'Otomatik üretilecek' }}</p>
+                                    <p class="text-[0.84rem] font-semibold text-brand-ink dark:text-white">
+                                        {{ $qrCode->short_id ?: 'Otomatik üretilecek' }}</p>
                                 </div>
 
                                 <label class="surface-panel qr-form-meta-card qr-form-status cursor-pointer">
@@ -493,7 +501,8 @@
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <input type="hidden" name="is_active" value="0">
-                                        <input type="checkbox" name="is_active" value="1" class="qr-form-status-toggle" @checked(old('is_active', $qrCode->is_active ?? true))>
+                                        <input type="checkbox" name="is_active" value="1" class="qr-form-status-toggle"
+                                            @checked(old('is_active', $qrCode->is_active ?? true))>
                                     </div>
                                 </label>
                             </div>
@@ -504,8 +513,10 @@
                         <div class="qr-form-actions">
                             <button type="submit" class="primary-button qr-form-submit">
                                 <span>{{ $submitLabel }}</span>
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                 </svg>
                             </button>
 
@@ -518,16 +529,19 @@
                                     <div>
                                         <p class="text-[0.82rem] font-semibold text-brand-ink dark:text-white">Kayıt bilgisi</p>
                                         <p class="mt-1 text-[0.76rem] text-slate-600 dark:text-slate-300">
-                                            Birim: {{ $qrCode->department?->name ?? 'Atanmamış' }} &middot; Oluşturan: {{ $qrCode->creator?->name ?? $qrCode->creator?->username ?? 'Bilinmiyor' }}
+                                            Birim: {{ $qrCode->department?->name ?? 'Atanmamış' }} &middot; Oluşturan:
+                                            {{ $qrCode->creator?->name ?? $qrCode->creator?->username ?? 'Bilinmiyor' }}
                                         </p>
                                     </div>
 
                                     <div class="flex flex-wrap gap-2.5">
                                         @if ($downloadUrl)
-                                            <a href="{{ $downloadUrl }}" class="ghost-button px-3.5 py-2 text-[0.78rem]">QR İndir</a>
+                                            <a href="{{ $downloadUrl }}" class="ghost-button px-3.5 py-2 text-[0.78rem]">QR
+                                                İndir</a>
                                         @endif
                                         @if ($deleteConfirmUrl)
-                                            <a href="{{ $deleteConfirmUrl }}" class="danger-button px-3.5 py-2 text-[0.78rem]">Kaydı Sil</a>
+                                            <a href="{{ $deleteConfirmUrl }}" class="danger-button px-3.5 py-2 text-[0.78rem]">Kaydı
+                                                Sil</a>
                                         @endif
                                     </div>
                                 </div>

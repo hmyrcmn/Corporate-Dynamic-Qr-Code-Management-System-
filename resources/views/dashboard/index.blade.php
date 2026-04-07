@@ -531,7 +531,7 @@
                 gap: 0.65rem;
             }
 
-            .dashboard-action-rail > * {
+            .dashboard-action-rail>* {
                 width: 100%;
                 justify-content: center;
             }
@@ -649,12 +649,14 @@
         }
 
         .qr-modal-panel {
-            width: min(100%, 28rem);
+            width: min(100%, 36rem);
             max-height: calc(100svh - 1.5rem);
             padding: clamp(1rem, 2vw, 1.75rem);
             border-radius: 2rem;
             overflow-y: auto;
             overscroll-behavior: contain;
+            transform: scale(1.1);
+            transform-origin: center;
         }
 
         .qr-modal-title {
@@ -675,9 +677,9 @@
             position: relative;
             margin-bottom: 1rem;
             display: flex;
-            width: min(100%, 22rem);
+            width: min(100%, 26rem);
             max-width: 100%;
-            max-height: min(50svh, 31rem);
+            max-height: min(60svh, 38rem);
             aspect-ratio: 18 / 25;
             align-items: center;
             justify-content: center;
@@ -707,7 +709,7 @@
 
         @media (max-width: 47.99rem) {
             .qr-modal-panel {
-                width: min(100%, 24.5rem);
+                width: min(100%, 27rem);
                 max-height: calc(100svh - 1rem);
                 border-radius: 1.6rem;
                 padding: 0.95rem;
@@ -726,7 +728,7 @@
             }
 
             .qr-modal-preview {
-                max-height: min(42svh, 23rem);
+                max-height: min(52svh, 27rem);
                 padding: 0.75rem;
                 border-radius: 1.35rem;
             }
@@ -753,7 +755,7 @@
             }
 
             .qr-modal-preview {
-                max-height: min(36svh, 18.5rem);
+                max-height: min(48svh, 24rem);
                 margin-bottom: 0.85rem;
             }
 
@@ -989,10 +991,9 @@
                 </svg>
             </button>
 
-            <h3 id="qr-modal-title"
-                class="qr-modal-title line-clamp-2 font-bold text-brand-ink dark:text-white">Yükleniyor...</h3>
-            <p
-                class="qr-modal-copy font-extrabold uppercase text-slate-500 dark:text-slate-400">
+            <h3 id="qr-modal-title" class="qr-modal-title line-clamp-2 font-bold text-brand-ink dark:text-white">
+                Yükleniyor...</h3>
+            <p class="qr-modal-copy font-extrabold uppercase text-slate-500 dark:text-slate-400">
                 Yunus Emre Enstitüsü kurumsal QR kartı
             </p>
 
@@ -1010,15 +1011,21 @@
 
             <div class="qr-modal-actions flex flex-col">
                 <div class="qr-modal-actions-row">
-                    <a id="qr-modal-download" href="#" class="brand-button px-3 py-3 text-[0.8rem]" title="Orijinal format: Vektörel SVG">
+                    <a id="qr-modal-download" href="#" class="brand-button px-3 py-3 text-[0.8rem]"
+                        title="Orijinal format: Vektörel SVG">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
                         <span>SVG İndir</span>
                     </a>
-                    <button type="button" onclick="downloadQrAsPng()" id="qr-modal-png-btn" class="brand-button px-3 py-3 text-[0.8rem] bg-[#0c757d] hover:bg-[#07474d] text-white shadow-md border-0" title="Sosyal Medya formatı: Keskin PNG">
+                    <button type="button" onclick="downloadQrAsPng()" id="qr-modal-png-btn"
+                        class="brand-button px-3 py-3 text-[0.8rem] bg-[#0c757d] hover:bg-[#07474d] text-white shadow-md border-0"
+                        title="Sosyal Medya formatı: Keskin PNG">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
                         </svg>
                         <span>PNG Kaydet</span>
                     </button>
@@ -1026,11 +1033,14 @@
                 <div class="qr-modal-actions-row">
                     <button type="button" onclick="printQr()" class="ghost-button px-4 py-3 text-[0.8rem]">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                            </path>
                         </svg>
                         <span>Yazdır</span>
                     </button>
-                    <button type="button" onclick="closeQRModal()" class="ghost-button px-4 py-3 text-[0.8rem]">Kapat</button>
+                    <button type="button" onclick="closeQRModal()"
+                        class="ghost-button px-4 py-3 text-[0.8rem]">Kapat</button>
                 </div>
             </div>
         </div>
@@ -1104,39 +1114,39 @@
 
             const svgImg = document.getElementById('qr-modal-img');
             const canvas = document.createElement('canvas');
-            
+
             canvas.width = 720;
             canvas.height = 1040;
             const ctx = canvas.getContext('2d');
-            
+
             const imgObj = new Image();
             imgObj.crossOrigin = 'Anonymous';
-            
+
             imgObj.onload = () => {
                 ctx.drawImage(imgObj, 0, 0, canvas.width, canvas.height);
                 const a = document.createElement('a');
-                const cleanTitle = document.getElementById('qr-modal-title').textContent.replace(/[^a-zA-Z0-9-_\.]/g, '').substring(0,20) || 'QR';
+                const cleanTitle = document.getElementById('qr-modal-title').textContent.replace(/[^a-zA-Z0-9-_\.]/g, '').substring(0, 20) || 'QR';
                 a.download = `Yunus-Emre-QR-${cleanTitle}.png`;
                 a.href = canvas.toDataURL('image/png', 1.0);
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                
+
                 btn.innerHTML = originalText;
                 btn.classList.remove('opacity-80', 'pointer-events-none');
             };
-            
+
             imgObj.onerror = () => {
                 alert('PNG dönüştürme işlemi tarayıcı engeline takıldı. Lütfen SVG İndir seçeneğini kullanın.');
                 btn.innerHTML = originalText;
                 btn.classList.remove('opacity-80', 'pointer-events-none');
             };
-            
+
             fetch(svgImg.src)
                 .then(response => response.blob())
                 .then(blob => {
                     const reader = new FileReader();
-                    reader.onloadend = function() {
+                    reader.onloadend = function () {
                         imgObj.src = reader.result;
                     }
                     reader.readAsDataURL(blob);
@@ -1151,23 +1161,23 @@
             if (!img.src) return;
             const printWin = window.open('', '_blank');
             printWin.document.write(`
-                <html>
-                    <head>
-                        <title>QR Kodu Yazdır</title>
-                        <style>
-                            @page { margin: 0; size: auto; }
-                            body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; font-family: sans-serif; }
-                            img { max-width: 100%; max-height: 98vh; object-fit: contain; }
-                        </style>
-                    </head>
-                    <body>
-                        <img src="${img.src}" />
-                        <script>
-                            window.onload = function() { window.print(); setTimeout(window.close, 1000); }
-                        <\/script>
-                    </body>
-                </html>
-            `);
+                                                            <html>
+                                                                <head>
+                                                                    <title>QR Kodu Yazdır</title>
+                                                                    <style>
+                                                                        @page { margin: 0; size: auto; }
+                                                                        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: white; font-family: sans-serif; }
+                                                                        img { max-width: 100%; max-height: 98vh; object-fit: contain; }
+                                                                    </style>
+                                                                </head>
+                                                                <body>
+                                                                    <img src="${img.src}" />
+                                                                    <script>
+                                                                        window.onload = function() { window.print(); setTimeout(window.close, 1000); }
+                                                                    <\/script>
+                                                                </body>
+                                                            </html>
+                                                        `);
             printWin.document.close();
         }
     </script>
