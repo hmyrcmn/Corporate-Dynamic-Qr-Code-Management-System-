@@ -303,6 +303,9 @@ class QrCodeController extends Controller
             ]);
         }
 
+
+        $payload['title'] = $this->titleCaseTr((string) $payload['title']);
+
         return $payload;
     }
 
@@ -381,9 +384,18 @@ class QrCodeController extends Controller
         $departmentFirstY = $textStartY + $departmentFontSize;
         $departmentTspans = $this->svgTspans($departmentLines, $centerX, $departmentFirstY, $departmentLineHeight);
 
-        $titleLines = $this->svgWrappedLines((string) $qrCode->title, 45, 2);
+        $signatureTitle = $this->titleCaseTr((string) $qrCode->title);
+        $titleFontSize = 22;
+        $titleLineHeight = 28;
+        $titleLines = $this->svgWrappedLines($signatureTitle, 45, 2);
+        $titleLineCount = max(count($titleLines), 1);
         $titleStartY = $departmentFirstY + (($departmentLineCount - 1) * $departmentLineHeight) + 40;
-        $titleTspans = $this->svgTspans($titleLines, $centerX, $titleStartY, 28);
+        $titleTspans = $this->svgTspans($titleLines, $centerX, $titleStartY, $titleLineHeight);
+        $titleBoxWidth = 560;
+        $titleBoxX = ($canvasWidth - $titleBoxWidth) / 2;
+        $titleBoxPaddingY = 12;
+        $titleBoxHeight = ($titleLineCount * $titleLineHeight) + ($titleBoxPaddingY * 2);
+        $titleBoxY = $titleStartY - $titleFontSize - $titleBoxPaddingY;
 
         $brandTextY = $brandLogoY + 45;
         $canvasInnerWidth = $canvasWidth - 2;
@@ -449,7 +461,8 @@ SVG
 
     <text x="{$centerX}" text-anchor="middle" font-family="-apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="{$departmentFontSize}" font-weight="700" letter-spacing="1.5" fill="#1D1D1F">{$departmentTspans}</text>
     
-    <text x="{$centerX}" text-anchor="middle" font-family="-apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="500" letter-spacing="0.2" fill="#86868B">{$titleTspans}</text>
+    <rect x="{$titleBoxX}" y="{$titleBoxY}" width="{$titleBoxWidth}" height="{$titleBoxHeight}" rx="20" fill="#F7FAFB" stroke="#E1EEF1" stroke-width="1.5"/>
+    <text x="{$centerX}" text-anchor="middle" font-family="-apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="{$titleFontSize}" font-weight="600" letter-spacing="0.12em" fill="#1D1D1F">{$titleTspans}</text>
 </svg>
 SVG;
     }
@@ -483,6 +496,41 @@ SVG;
     private function svgText(string $value): string
     {
         return htmlspecialchars($value, ENT_QUOTES | ENT_XML1, 'UTF-8');
+    }
+
+    private function titleCaseTr(string $value): string
+    {
+        $normalized = trim((string) preg_replace('/\s+/u', ' ', $value));
+
+        if ($normalized === '') {
+            return '';
+        }
+
+        $words = preg_split('/\s+/u', $normalized) ?: [];
+        $titled = [];
+
+        foreach ($words as $word) {
+            $lower = $this->trLower($word);
+            $first = mb_substr($lower, 0, 1, 'UTF-8');
+            $rest = mb_substr($lower, 1, null, 'UTF-8');
+            $titled[] = $this->trUpper($first) . $rest;
+        }
+
+        return implode(' ', $titled);
+    }
+
+    private function trLower(string $value): string
+    {
+        $value = str_replace(['İ', 'I'], ['i', 'ı'], $value);
+
+        return mb_strtolower($value, 'UTF-8');
+    }
+
+    private function trUpper(string $value): string
+    {
+        $value = str_replace(['i', 'ı'], ['İ', 'I'], $value);
+
+        return mb_strtoupper($value, 'UTF-8');
     }
 
     /**
