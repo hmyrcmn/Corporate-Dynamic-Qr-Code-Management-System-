@@ -1,0 +1,12 @@
+services:
+  qr-app:
+    build: .
+    container_name: qr-app-container
+    restart: always
+    networks:
+      - imza-network
+
+networks:
+  imza-network:
+    name: imza-prod_imza-network
+    external: true

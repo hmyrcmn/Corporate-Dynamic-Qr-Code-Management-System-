@@ -342,6 +342,10 @@ class QrCodeController extends Controller
 
         $qrSize = $qrResult->getMatrix()->getOuterSize();
         $qrContent = $this->extractSvgContents($qrResult->getString());
+        $qrContent = preg_replace('/<rect[^>]*fill=\"#ffffff\"[^>]*\\/>/i', '', $qrContent) ?? $qrContent;
+        $qrContent = trim($qrContent);
+        $qrShadowContent = preg_replace('/fill="#0d232e"/i', 'fill="#06212b"', $qrContent) ?? $qrContent;
+        $qrInkContent = preg_replace('/fill="#0d232e"/i', 'fill="url(#qrInk)"', $qrContent) ?? $qrContent;
 
         $canvasWidth = 720;
         $canvasHeight = 1040;
@@ -355,19 +359,38 @@ class QrCodeController extends Controller
         $qrPanelSize = 520;
         $qrPanelX = ($canvasWidth - $qrPanelSize) / 2;
         $qrPanelY = $brandLogoY + $brandLogoHeight + 50;
+        $qrPanelRadius = 34;
+        $qrPanelShadowX = $qrPanelX + 10;
+        $qrPanelShadowY = $qrPanelY + 12;
+        $qrShadowOffsetX = 2;
+        $qrShadowOffsetY = 3;
 
         $qrTranslateX = $qrPanelX + (($qrPanelSize - $qrSize) / 2);
         $qrTranslateY = $qrPanelY + (($qrPanelSize - $qrSize) / 2);
 
-        $logoBadgeSize = 90;
+        $portraitSize = 320;
+        $portraitX = $qrPanelX + (($qrPanelSize - $portraitSize) / 2);
+        $portraitY = $qrPanelY + (($qrPanelSize - $portraitSize) / 2);
+        $portraitCenterX = $canvasWidth / 2;
+        $portraitCenterY = $qrPanelY + ($qrPanelSize / 2);
+        $portraitRadius = $portraitSize / 2;
+        $portraitOpacity = 0.14;
+
+        $logoBadgeSize = 96;
         $logoBadgeX = ($canvasWidth - $logoBadgeSize) / 2;
         $logoBadgeY = $qrPanelY + (($qrPanelSize - $logoBadgeSize) / 2);
-        $logoSize = 48;
+        $logoBadgeRadius = 26;
+        $logoSize = 52;
         $logoX = ($canvasWidth - $logoSize) / 2;
         $logoY = $logoBadgeY + (($logoBadgeSize - $logoSize) / 2);
+        $logoBadgeInnerX = $logoBadgeX + 4;
+        $logoBadgeInnerY = $logoBadgeY + 4;
+        $logoBadgeInnerSize = $logoBadgeSize - 8;
+        $logoBadgeInnerRadius = $logoBadgeRadius - 4;
 
         $brandLogoDataUri = $this->imageDataUri(public_path('img/yee-logo.png'));
         $faviconDataUri = $this->imageDataUri(public_path('img/yee-favicon.png'));
+        $portraitDataUri = $this->imageDataUri(public_path('img/yunus-emre-portrait.png'));
 
         $rawDepartmentName = trim((string) ($qrCode->department?->name ?? 'Kurumsal Birim'));
         $rawDepartmentName = mb_strtoupper(str_replace(['i', 'ı'], ['İ', 'I'], $rawDepartmentName), 'UTF-8');
@@ -416,20 +439,48 @@ class QrCodeController extends Controller
             <stop offset="100%" stop-color="#DEEBEF" stop-opacity="0.3"/>
         </linearGradient>
 
-        <filter id="qrShadow" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="15" result="blur"/>
-            <feOffset dy="8" result="offsetBlur"/>
-            <feComponentTransfer>
-                <feFuncA type="linear" slope="0.04"/>
-            </feComponentTransfer>
-            <feMerge>
-                <feMergeNode/>
-                <feMergeNode in="SourceGraphic"/>
-            </feMerge>
+        <linearGradient id="qrPanelFill" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="100%" stop-color="#EAF4F6"/>
+        </linearGradient>
+        <linearGradient id="qrPanelEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#CFE2E7" stop-opacity="0.9"/>
+        </linearGradient>
+        <linearGradient id="qrInk" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0F4B59"/>
+            <stop offset="60%" stop-color="#0B2F39"/>
+            <stop offset="100%" stop-color="#081E26"/>
+        </linearGradient>
+        <linearGradient id="badgeFill" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="100%" stop-color="#EAF4F6"/>
+        </linearGradient>
+        <linearGradient id="badgeRing" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#19C3CE"/>
+            <stop offset="100%" stop-color="#0B6A73"/>
+        </linearGradient>
+        <radialGradient id="portraitHalo" cx="50%" cy="40%" r="65%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+        </radialGradient>
+        <clipPath id="qrPortraitClip">
+            <circle cx="{$portraitCenterX}" cy="{$portraitCenterY}" r="{$portraitRadius}"/>
+        </clipPath>
+
+        <filter id="qrShadow" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+            <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0B2B33" flood-opacity="0.18"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0B2B33" flood-opacity="0.12"/>
         </filter>
-        
+        <filter id="qrLift" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+            <feDropShadow dx="1" dy="2" stdDeviation="1.2" flood-color="#00161C" flood-opacity="0.25"/>
+        </filter>
+        <filter id="portraitSoft" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+            <feGaussianBlur stdDeviation="0.6"/>
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0B2B33" flood-opacity="0.25"/>
+        </filter>
         <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.10"/>
+            <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.18"/>
         </filter>
     </defs>
 
@@ -442,17 +493,37 @@ SVG
             . <<<SVG
 
     <g filter="url(#qrShadow)">
-        <rect x="{$qrPanelX}" y="{$qrPanelY}" width="{$qrPanelSize}" height="{$qrPanelSize}" rx="32" fill="#FFFFFF"/>
+        <rect x="{$qrPanelShadowX}" y="{$qrPanelShadowY}" width="{$qrPanelSize}" height="{$qrPanelSize}" rx="{$qrPanelRadius}" fill="#DDE9ED"/>
     </g>
+    <rect x="{$qrPanelX}" y="{$qrPanelY}" width="{$qrPanelSize}" height="{$qrPanelSize}" rx="{$qrPanelRadius}" fill="url(#qrPanelFill)"/>
+    <rect x="{$qrPanelX}" y="{$qrPanelY}" width="{$qrPanelSize}" height="{$qrPanelSize}" rx="{$qrPanelRadius}" fill="none" stroke="url(#qrPanelEdge)" stroke-width="2"/>
+SVG
+            . ($portraitDataUri !== ''
+                ? <<<SVG
+
+    <g opacity="{$portraitOpacity}" clip-path="url(#qrPortraitClip)">
+        <image href="{$portraitDataUri}" x="{$portraitX}" y="{$portraitY}" width="{$portraitSize}" height="{$portraitSize}" preserveAspectRatio="xMidYMid meet" filter="url(#portraitSoft)"/>
+        <rect x="{$qrPanelX}" y="{$qrPanelY}" width="{$qrPanelSize}" height="{$qrPanelSize}" fill="url(#portraitHalo)"/>
+    </g>
+SVG
+                : '')
+            . <<<SVG
     <g transform="translate({$qrTranslateX} {$qrTranslateY})">
-        {$qrContent}
+        <g opacity="0.25" transform="translate({$qrShadowOffsetX} {$qrShadowOffsetY})">
+            {$qrShadowContent}
+        </g>
+        <g filter="url(#qrLift)">
+            {$qrInkContent}
+        </g>
     </g>
 SVG
             . ($faviconDataUri !== ''
                 ? <<<SVG
 
     <g filter="url(#badgeShadow)">
-        <rect x="{$logoBadgeX}" y="{$logoBadgeY}" width="{$logoBadgeSize}" height="{$logoBadgeSize}" rx="24" fill="#FFFFFF"/>
+        <rect x="{$logoBadgeX}" y="{$logoBadgeY}" width="{$logoBadgeSize}" height="{$logoBadgeSize}" rx="{$logoBadgeRadius}" fill="url(#badgeFill)"/>
+        <rect x="{$logoBadgeX}" y="{$logoBadgeY}" width="{$logoBadgeSize}" height="{$logoBadgeSize}" rx="{$logoBadgeRadius}" fill="none" stroke="url(#badgeRing)" stroke-width="2"/>
+        <rect x="{$logoBadgeInnerX}" y="{$logoBadgeInnerY}" width="{$logoBadgeInnerSize}" height="{$logoBadgeInnerSize}" rx="{$logoBadgeInnerRadius}" fill="none" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1"/>
         <image href="{$faviconDataUri}" x="{$logoX}" y="{$logoY}" width="{$logoSize}" height="{$logoSize}" preserveAspectRatio="xMidYMid meet"/>
     </g>
 SVG
